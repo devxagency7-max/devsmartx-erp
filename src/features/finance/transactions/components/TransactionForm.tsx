@@ -188,7 +188,7 @@ export function TransactionForm({
           {fe('paymentSourceId') && <p role="alert" className="text-xs text-[hsl(var(--destructive))]">{fe('paymentSourceId')}</p>}
 
           {/* Partner contributions — shown inline under payment source for Expense */}
-          {selectedType === TransactionType.Expense && selectedPaymentSourceId && !readOnly && (
+          {selectedType === TransactionType.Expense && !readOnly && (
             <PartnerContributionsSection
               totalAmount={typeof watchedAmount === 'number' ? watchedAmount : 0}
               currency={watchedCurrency ?? 'EGP'}
