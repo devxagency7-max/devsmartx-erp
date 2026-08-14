@@ -122,7 +122,12 @@ export const transactionService = {
       categoryName: null,
       description: input.description,
       notes: input.notes,
-      attachments: [],
+      attachments: (input.attachments ?? []).map((a) => ({
+        id: a.publicId,
+        fileName: a.fileName,
+        fileUrl: a.url,
+        mimeType: a.mimeType ?? '',
+      })),
       transactionDate: input.transactionDate,
       createdAt: now(),
       updatedAt: now(),

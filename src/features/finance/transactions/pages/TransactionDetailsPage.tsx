@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Pencil } from 'lucide-react';
+import { ArrowLeft, Pencil, Paperclip, ExternalLink } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Skeleton } from '@/shared/components/ui/skeleton';
@@ -135,16 +135,45 @@ export function TransactionDetailsPage() {
         </CardContent>
       </Card>
 
-      {/* Attachments placeholder */}
-      <Card>
-        <CardContent className="pt-6">
-          <SectionHeader title={t('transaction.attachments')} className="pb-4" />
-          <Separator className="mb-4" />
-          <p className="text-sm text-center text-[hsl(var(--muted-foreground))] py-6">
-            {t('transaction.attachmentsPlaceholder')}
-          </p>
-        </CardContent>
-      </Card>
+      {/* Attachments */}
+      {tx.attachments && tx.attachments.length > 0 && (
+        <Card>
+          <CardContent className="pt-6">
+            <SectionHeader title={t('transaction.attachments')} className="pb-4" />
+            <Separator className="mb-4" />
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {tx.attachments.map((att) => {
+                const isImage = att.mimeType?.startsWith('image/');
+                return (
+                  <a
+                    key={att.id}
+                    href={att.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative flex flex-col overflow-hidden rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--muted))]/30 hover:border-[hsl(var(--primary))]/50 transition-colors"
+                  >
+                    {isImage ? (
+                      <img
+                        src={att.fileUrl}
+                        alt={att.fileName}
+                        className="h-32 w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-32 items-center justify-center">
+                        <Paperclip size={28} className="text-[hsl(var(--muted-foreground))]" />
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between gap-1 px-2 py-1.5">
+                      <span className="truncate text-xs text-[hsl(var(--foreground))]">{att.fileName}</span>
+                      <ExternalLink size={11} className="shrink-0 text-[hsl(var(--muted-foreground))] group-hover:text-[hsl(var(--primary))]" />
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Timeline placeholder */}
       <Card>
