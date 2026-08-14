@@ -17,7 +17,7 @@ export const transactionSchema = z
       .positive('transaction.validation.amountPositive'),
     currency: z.enum(CURRENCY_CODES, { message: 'transaction.validation.currencyRequired' }),
     paymentMethod: z.nativeEnum(PaymentMethod, { message: 'transaction.validation.paymentMethodRequired' }),
-    categoryId: z.string().min(1, 'transaction.validation.categoryRequired'),
+    categoryId: z.string(),
     description: z.string().min(1, 'transaction.validation.descriptionRequired').max(500),
     notes: z.string().max(1000),
     transactionDate: z.string().min(1, 'transaction.validation.dateRequired'),
