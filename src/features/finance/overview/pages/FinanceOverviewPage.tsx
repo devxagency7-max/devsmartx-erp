@@ -55,7 +55,7 @@ export default function FinanceOverviewPage() {
                     {t('financeOverview.all_time_revenue')}
                   </p>
                   <p className="mt-1 text-xl font-bold text-[hsl(var(--success))]">
-                    {formatAmount(allTimeRevenue, 'SAR')}
+                    {formatAmount(allTimeRevenue, 'EGP')}
                   </p>
                 </div>
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[hsl(var(--success))]/10">
@@ -73,7 +73,7 @@ export default function FinanceOverviewPage() {
                     {t('financeOverview.all_time_expenses')}
                   </p>
                   <p className="mt-1 text-xl font-bold text-[hsl(var(--destructive))]">
-                    {formatAmount(allTimeExpenses, 'SAR')}
+                    {formatAmount(allTimeExpenses, 'EGP')}
                   </p>
                 </div>
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[hsl(var(--destructive))]/10">
@@ -91,7 +91,7 @@ export default function FinanceOverviewPage() {
                     {t('financeOverview.all_time_net')}
                   </p>
                   <p className={`mt-1 text-xl font-bold ${allTimeNet >= 0 ? 'text-[hsl(var(--success))]' : 'text-[hsl(var(--destructive))]'}`}>
-                    {formatAmount(allTimeNet, 'SAR')}
+                    {formatAmount(allTimeNet, 'EGP')}
                   </p>
                 </div>
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[hsl(var(--primary))]/10">

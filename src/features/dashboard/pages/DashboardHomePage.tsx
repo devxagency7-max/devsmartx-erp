@@ -42,7 +42,7 @@ function KpiCard({
 }) {
   const formatted = isCount
     ? String(value)
-    : formatAmount(value, currency ?? 'SAR');
+    : formatAmount(value, currency ?? 'EGP');
 
   const trendColor =
     trend === 'up'
@@ -174,7 +174,7 @@ export function DashboardHomePage() {
                       {t('dashboard.flow_income')}
                     </span>
                     <span className="text-xs font-mono font-semibold text-[hsl(var(--success))]">
-                      {formatAmount(totalRevenue, 'SAR')}
+                      {formatAmount(totalRevenue, 'EGP')}
                     </span>
                   </div>
                   <div className="h-2.5 w-full rounded-full bg-[hsl(var(--muted))]">
@@ -191,7 +191,7 @@ export function DashboardHomePage() {
                       {t('dashboard.flow_expenses')}
                     </span>
                     <span className="text-xs font-mono font-semibold text-[hsl(var(--destructive))]">
-                      {formatAmount(totalExpenses, 'SAR')}
+                      {formatAmount(totalExpenses, 'EGP')}
                     </span>
                   </div>
                   <div className="h-2.5 w-full rounded-full bg-[hsl(var(--muted))]">
