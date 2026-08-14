@@ -1,7 +1,7 @@
 import { PlusCircle, Trash2, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@/shared/components/ui/input';
-import { usePeople } from '@/features/finance/people/hooks/usePeople';
+import { usePartners } from '@/features/finance/master-data/partners/hooks/usePartners';
 import { formatAmount } from '../utils/formatAmount';
 import type { CurrencyCode } from '../types/transaction.types';
 import type { PartnerContributionEntry } from '../types/transaction.types';
@@ -15,8 +15,7 @@ interface Props {
 
 export function PartnerContributionsSection({ totalAmount, currency, contributions, onChange }: Props) {
   const { t } = useTranslation();
-  const { data: people = [], isLoading } = usePeople({ status: 'Active' });
-  const partners = people.filter((p) => p.type === 'Partner');
+  const { data: partners = [], isLoading } = usePartners({ status: 'active' });
 
   const totalContributed = contributions.reduce((s, c) => s + c.amount, 0);
 
@@ -46,9 +45,6 @@ export function PartnerContributionsSection({ totalAmount, currency, contributio
     onChange(contributions.map((c) => ({ ...c, amount: perPerson })));
   }
 
-  if (isLoading) return null;
-  if (partners.length === 0) return null;
-
   return (
     <div className="space-y-3 rounded-xl border border-[hsl(var(--border))] p-4">
       <div className="flex items-center justify-between">
@@ -70,28 +66,36 @@ export function PartnerContributionsSection({ totalAmount, currency, contributio
       </div>
 
       {/* Partner toggle buttons */}
-      <div className="flex flex-wrap gap-2">
-        {partners.map((p) => {
-          const isSelected = contributions.some((c) => c.personId === p.id);
-          return (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() =>
-                isSelected ? removeContribution(p.id) : addContribution(p.id, p.name)
-              }
-              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
-                isSelected
-                  ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))]'
-                  : 'border-[hsl(var(--border))] text-[hsl(var(--foreground))] hover:border-[hsl(var(--primary))]/50'
-              }`}
-            >
-              {isSelected ? <Trash2 size={11} /> : <PlusCircle size={11} />}
-              {p.name}
-            </button>
-          );
-        })}
-      </div>
+      {isLoading ? (
+        <p className="text-center text-xs text-[hsl(var(--muted-foreground))]">…</p>
+      ) : partners.length === 0 ? (
+        <p className="text-center text-xs text-[hsl(var(--muted-foreground))]">
+          {t('expense.partnerContributions.noPartners')}
+        </p>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {partners.map((p) => {
+            const isSelected = contributions.some((c) => c.personId === p.id);
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() =>
+                  isSelected ? removeContribution(p.id) : addContribution(p.id, p.name)
+                }
+                className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
+                  isSelected
+                    ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))]'
+                    : 'border-[hsl(var(--border))] text-[hsl(var(--foreground))] hover:border-[hsl(var(--primary))]/50'
+                }`}
+              >
+                {isSelected ? <Trash2 size={11} /> : <PlusCircle size={11} />}
+                {p.name}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Amount rows */}
       {contributions.length > 0 && (
@@ -139,7 +143,7 @@ export function PartnerContributionsSection({ totalAmount, currency, contributio
         </div>
       )}
 
-      {contributions.length === 0 && (
+      {partners.length > 0 && contributions.length === 0 && (
         <p className="text-center text-xs text-[hsl(var(--muted-foreground))]">
           {t('expense.partnerContributions.hint')}
         </p>
