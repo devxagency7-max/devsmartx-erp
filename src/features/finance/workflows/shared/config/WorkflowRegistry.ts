@@ -21,10 +21,11 @@ export const EXPENSE_WORKFLOW: FinancialWorkflowDefinition = {
     { id: 'category',     labelKey: 'expense.wizard.steps.category',    showInIndicator: true  },
     { id: 'paymentSource', labelKey: 'expense.wizard.steps.paymentSource', showInIndicator: true  },
     { id: 'payment',      labelKey: 'expense.wizard.steps.payment',      showInIndicator: true  },
-    { id: 'details',      labelKey: 'expense.wizard.steps.details',      showInIndicator: true  },
-    { id: 'attachments',  labelKey: 'expense.wizard.steps.attachments',  showInIndicator: true  },
-    { id: 'review',       labelKey: 'expense.wizard.steps.review',       showInIndicator: true  },
-    { id: 'confirmation', labelKey: 'expense.wizard.steps.confirmation', showInIndicator: false },
+    { id: 'details',               labelKey: 'expense.wizard.steps.details',               showInIndicator: true  },
+    { id: 'partnerContributions',  labelKey: 'expense.wizard.steps.partnerContributions',  showInIndicator: true  },
+    { id: 'attachments',           labelKey: 'expense.wizard.steps.attachments',           showInIndicator: true  },
+    { id: 'review',                labelKey: 'expense.wizard.steps.review',                showInIndicator: true  },
+    { id: 'confirmation',          labelKey: 'expense.wizard.steps.confirmation',          showInIndicator: false },
   ],
   extraReviewRows: [
     {

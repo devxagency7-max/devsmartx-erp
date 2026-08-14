@@ -472,6 +472,14 @@ export const en = {
       vendor: 'Vendor',
       vendorPlaceholder: 'Who was paid? (optional)',
     },
+    partnerContributions: {
+      totalExpense: 'Total expense amount',
+      selectPartners: 'Who contributed to this expense?',
+      noPartners: 'No partners found. Add partners from the People section.',
+      hint: 'Select partners above to add their contributions.',
+      splitEqually: 'Split equally',
+      totalContributed: 'Total contributed',
+    },
     wizard: {
       selectCategory: 'Select a category',
       selectPaymentSource: 'Select a payment source',
@@ -488,6 +496,7 @@ export const en = {
         paymentSource: 'Payment Source',
         payment: 'Payment',
         details: 'Details',
+        partnerContributions: 'Contributions',
         attachments: 'Attachments',
         review: 'Review',
         confirmation: 'Done',

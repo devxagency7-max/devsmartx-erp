@@ -472,6 +472,14 @@ export const ar = {
       vendor: 'المورد',
       vendorPlaceholder: 'من تم الدفع له؟ (اختياري)',
     },
+    partnerContributions: {
+      totalExpense: 'إجمالي المصروف',
+      selectPartners: 'من ساهم في هذا المصروف؟',
+      noPartners: 'لا يوجد شركاء. أضف شركاء من قسم الأشخاص.',
+      hint: 'اختر الشركاء أعلاه لإضافة مساهماتهم.',
+      splitEqually: 'تقسيم بالتساوي',
+      totalContributed: 'إجمالي المساهمات',
+    },
     wizard: {
       selectCategory: 'اختر الفئة',
       selectPaymentSource: 'اختر مصدر الدفع',
@@ -488,6 +496,7 @@ export const ar = {
         paymentSource: 'مصدر الدفع',
         payment: 'الدفع',
         details: 'التفاصيل',
+        partnerContributions: 'المساهمات',
         attachments: 'المرفقات',
         review: 'مراجعة',
         confirmation: 'تم',

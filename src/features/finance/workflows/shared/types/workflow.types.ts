@@ -1,4 +1,10 @@
 import type { TransactionType } from '@/features/finance/domain/enums/TransactionType';
+
+export interface PartnerContribution {
+  personId: string;
+  personName: string;
+  amount: number;
+}
 import type { LucideIcon } from 'lucide-react';
 import type { TransactionDTO } from '@/features/finance/application/queries/TransactionQueries';
 import type { UploadResult } from '@/shared/upload';
@@ -25,6 +31,8 @@ export interface WorkflowFormData {
   partnerName?: string;
   /** Original transaction for Refund workflows */
   originalTransactionId?: string;
+  /** Partner contributions: who paid and how much (for split expenses) */
+  partnerContributions?: PartnerContribution[];
   /** Workflow-specific extra fields (e.g. vendor for Expense) */
   extra: Record<string, string | number | boolean>;
 }
@@ -38,6 +46,7 @@ export type WorkflowStepId =
   | 'partner'
   | 'payment'
   | 'details'
+  | 'partnerContributions'
   | 'attachments'
   | 'review'
   | 'confirmation';

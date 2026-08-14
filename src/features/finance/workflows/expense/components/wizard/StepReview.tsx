@@ -33,6 +33,7 @@ export function StepReview({ data, isFirstStep, onSuccess, onBack, onCancel }: S
   }
 
   const vendor = (data.extra.vendor as string) || '';
+  const contributions = data.partnerContributions ?? [];
 
   const reviewRows = [
     { label: t('transaction.category'), value: data.categoryName },
@@ -43,6 +44,12 @@ export function StepReview({ data, isFirstStep, onSuccess, onBack, onCancel }: S
     ...(vendor ? [{ label: t('expense.fields.vendor'), value: vendor }] : []),
     { label: t('transaction.description'), value: data.description },
     ...(data.notes ? [{ label: t('transaction.notes'), value: data.notes }] : []),
+    ...(contributions.length > 0
+      ? contributions.map((c) => ({
+          label: c.personName,
+          value: formatAmount(c.amount, data.currency as CurrencyCode),
+        }))
+      : []),
   ];
 
   return (

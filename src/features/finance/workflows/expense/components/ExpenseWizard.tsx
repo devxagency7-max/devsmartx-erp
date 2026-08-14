@@ -9,6 +9,7 @@ import { StepWallet } from './wizard/StepWallet';
 import { StepPayment } from './wizard/StepPayment';
 import { StepDetails } from './wizard/StepDetails';
 import { StepAttachments } from './wizard/StepAttachments';
+import { StepPartnerContributions } from './wizard/StepPartnerContributions';
 import { StepReview } from './wizard/StepReview';
 import type { WorkflowFormData } from '@/features/finance/workflows/shared/types/workflow.types';
 
@@ -66,6 +67,7 @@ export function ExpenseWizard() {
       {currentStepId === 'paymentSource' && <StepWallet      {...stepProps} />}
       {currentStepId === 'payment'      && <StepPayment     {...stepProps} />}
       {currentStepId === 'details'      && <StepDetails     {...stepProps} />}
+      {currentStepId === 'partnerContributions' && <StepPartnerContributions {...stepProps} />}
       {currentStepId === 'attachments'  && <StepAttachments {...stepProps} />}
       {currentStepId === 'review'       && (
         <StepReview
