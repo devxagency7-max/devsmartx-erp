@@ -72,6 +72,7 @@ export interface TransactionFormInput {
   notes: string;
   transactionDate: string;
   partnerContributions?: PartnerContributionEntry[];
+  attachments?: import('@/shared/upload').UploadResult[];
 }
 
 /** Filters for the transaction list. */

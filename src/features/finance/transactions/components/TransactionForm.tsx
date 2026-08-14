@@ -19,6 +19,8 @@ import { PaymentMethod } from '@/features/finance/domain/enums/PaymentMethod';
 import { transactionSchema, type TransactionSchema } from '../validation/transaction.schema';
 import { getTypeConfig } from '../utils/transactionTypeConfig';
 import { PartnerContributionsSection } from './PartnerContributionsSection';
+import { FileUploader } from '@/shared/upload/components/FileUploader';
+import type { UploadResult } from '@/shared/upload';
 import type { CurrencyCode, PartnerContributionEntry } from '../types/transaction.types';
 
 const TX_TYPES = Object.values(TransactionType).filter(
@@ -36,7 +38,7 @@ interface PaymentSourceOption {
 interface TransactionFormProps {
   defaultValues?: Partial<TransactionSchema>;
   paymentSources: PaymentSourceOption[];
-  onSubmit: (values: TransactionSchema, contributions: PartnerContributionEntry[]) => Promise<void>;
+  onSubmit: (values: TransactionSchema, contributions: PartnerContributionEntry[], attachments: UploadResult[]) => Promise<void>;
   isLoading: boolean;
   error: string | null;
   onCancel: () => void;
@@ -56,6 +58,7 @@ export function TransactionForm({
 }: TransactionFormProps) {
   const { t } = useTranslation();
   const [contributions, setContributions] = useState<PartnerContributionEntry[]>([]);
+  const [attachments, setAttachments] = useState<UploadResult[]>([]);
 
   const {
     register,
@@ -115,7 +118,7 @@ export function TransactionForm({
   const fieldClass = readOnly ? 'pointer-events-none opacity-60' : '';
 
   return (
-    <form onSubmit={handleSubmit((values) => onSubmit(values, contributions))} noValidate className="space-y-5">
+    <form onSubmit={handleSubmit((values) => onSubmit(values, contributions, attachments))} noValidate className="space-y-5">
       {readOnly && (
         <div className="flex items-start gap-2 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--muted))]/40 px-3 py-2.5 text-sm text-[hsl(var(--muted-foreground))]">
           <Info size={14} className="mt-0.5 shrink-0" />
@@ -379,10 +382,16 @@ export function TransactionForm({
         />
       )}
 
-      {/* Attachments placeholder */}
-      <div className="rounded-lg border border-dashed border-[hsl(var(--border))] p-4 text-center text-sm text-[hsl(var(--muted-foreground))]">
-        {t('transaction.attachmentsPlaceholder')}
-      </div>
+      {/* Attachments */}
+      {!readOnly && (
+        <div className="space-y-1.5">
+          <Label>{t('transaction.attachments')}</Label>
+          <FileUploader
+            folder="transactions"
+            onUploadComplete={(results) => setAttachments((prev) => [...prev, ...results])}
+          />
+        </div>
+      )}
 
       {!readOnly && (
         <div className="flex justify-end gap-2 pt-2">
