@@ -289,49 +289,37 @@ export function TransactionForm({
         </div>
       </div>
 
-      {/* Payment Method + Category */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className={`space-y-1.5 ${fieldClass}`}>
-          <Label>{t('transaction.paymentMethod')}</Label>
-          <Controller
-            name="paymentMethod"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange} disabled={readOnly}>
-                <SelectTrigger aria-invalid={!!errors.paymentMethod}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PAYMENT_METHODS.map((pm) => (
-                    <SelectItem key={pm} value={pm}>
-                      {t(`transaction.pm_${pm}`)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {fe('paymentMethod') && <p role="alert" className="text-xs text-[hsl(var(--destructive))]">{fe('paymentMethod')}</p>}
-        </div>
+      {/* Payment Method */}
+      <div className={`space-y-1.5 ${fieldClass}`}>
+        <Label>{t('transaction.paymentMethod')}</Label>
+        <Controller
+          name="paymentMethod"
+          control={control}
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange} disabled={readOnly}>
+              <SelectTrigger aria-invalid={!!errors.paymentMethod}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PAYMENT_METHODS.map((pm) => (
+                  <SelectItem key={pm} value={pm}>
+                    {t(`transaction.pm_${pm}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+        {fe('paymentMethod') && <p role="alert" className="text-xs text-[hsl(var(--destructive))]">{fe('paymentMethod')}</p>}
+      </div>
 
-        <div className={`space-y-1.5 ${fieldClass}`}>
-          <Label>{t('transaction.category')}</Label>
-          <Controller
-            name="categoryId"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange} disabled={readOnly}>
-                <SelectTrigger aria-invalid={!!errors.categoryId}>
-                  <SelectValue placeholder={t('transaction.category')} />
-                </SelectTrigger>
-                <SelectContent>
-                  {/* Categories populated by parent page via useCategories() */}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {fe('categoryId') && <p role="alert" className="text-xs text-[hsl(var(--destructive))]">{fe('categoryId')}</p>}
-        </div>
+      {/* Hidden: keeps categoryId registered in form schema without showing UI */}
+      <div className="hidden">
+        <Controller
+          name="categoryId"
+          control={control}
+          render={({ field }) => <input type="hidden" {...field} />}
+        />
       </div>
 
       {/* Date */}
