@@ -40,7 +40,8 @@ export function EditTransactionPage() {
     ]);
   }, [setItems, t, tx?.referenceNumber, id]);
 
-  async function handleSubmit(values: TransactionSchema) {
+  async function handleSubmit(values: TransactionSchema, _contributions: unknown) {
+    void _contributions;
     if (!id) return;
     setIsSaving(true);
     setSaveError(null);

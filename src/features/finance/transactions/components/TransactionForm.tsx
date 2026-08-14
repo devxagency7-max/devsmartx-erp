@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +18,8 @@ import { TransactionType } from '@/features/finance/domain/enums/TransactionType
 import { PaymentMethod } from '@/features/finance/domain/enums/PaymentMethod';
 import { transactionSchema, type TransactionSchema } from '../validation/transaction.schema';
 import { getTypeConfig } from '../utils/transactionTypeConfig';
-import type { CurrencyCode } from '../types/transaction.types';
+import { PartnerContributionsSection } from './PartnerContributionsSection';
+import type { CurrencyCode, PartnerContributionEntry } from '../types/transaction.types';
 
 const TX_TYPES = Object.values(TransactionType).filter(
   (t) => t !== TransactionType.OpeningBalance,
@@ -35,7 +36,7 @@ interface PaymentSourceOption {
 interface TransactionFormProps {
   defaultValues?: Partial<TransactionSchema>;
   paymentSources: PaymentSourceOption[];
-  onSubmit: (values: TransactionSchema) => Promise<void>;
+  onSubmit: (values: TransactionSchema, contributions: PartnerContributionEntry[]) => Promise<void>;
   isLoading: boolean;
   error: string | null;
   onCancel: () => void;
@@ -54,6 +55,7 @@ export function TransactionForm({
   mode = 'create',
 }: TransactionFormProps) {
   const { t } = useTranslation();
+  const [contributions, setContributions] = useState<PartnerContributionEntry[]>([]);
 
   const {
     register,
@@ -83,6 +85,8 @@ export function TransactionForm({
 
   const selectedType = watch('type');
   const selectedPaymentSourceId = watch('paymentSourceId');
+  const watchedAmount = watch('amount');
+  const watchedCurrency = watch('currency');
   const config = getTypeConfig(selectedType);
 
   // Auto-set currency from selected payment source
@@ -98,6 +102,11 @@ export function TransactionForm({
     if (!config.showOriginalTransaction) setValue('originalTransactionId', '');
   }, [selectedType, config, setValue]);
 
+  // Reset contributions when type changes away from Expense
+  useEffect(() => {
+    if (selectedType !== TransactionType.Expense) setContributions([]);
+  }, [selectedType]);
+
   function fe(key: keyof TransactionSchema) {
     const msg = errors[key]?.message;
     return msg ? t(msg as string) : undefined;
@@ -106,7 +115,7 @@ export function TransactionForm({
   const fieldClass = readOnly ? 'pointer-events-none opacity-60' : '';
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
+    <form onSubmit={handleSubmit((values) => onSubmit(values, contributions))} noValidate className="space-y-5">
       {readOnly && (
         <div className="flex items-start gap-2 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--muted))]/40 px-3 py-2.5 text-sm text-[hsl(var(--muted-foreground))]">
           <Info size={14} className="mt-0.5 shrink-0" />
@@ -359,6 +368,16 @@ export function TransactionForm({
           {...register('notes')}
         />
       </div>
+
+      {/* Partner Contributions (Expense only) */}
+      {selectedType === TransactionType.Expense && !readOnly && (
+        <PartnerContributionsSection
+          totalAmount={typeof watchedAmount === 'number' ? watchedAmount : 0}
+          currency={watchedCurrency ?? 'EGP'}
+          contributions={contributions}
+          onChange={setContributions}
+        />
+      )}
 
       {/* Attachments placeholder */}
       <div className="rounded-lg border border-dashed border-[hsl(var(--border))] p-4 text-center text-sm text-[hsl(var(--muted-foreground))]">

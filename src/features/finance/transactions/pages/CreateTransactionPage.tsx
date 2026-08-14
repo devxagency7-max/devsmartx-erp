@@ -10,6 +10,7 @@ import { TransactionType } from '@/features/finance/domain/enums/TransactionType
 import { useCreateTransaction } from '../hooks/useCreateTransaction';
 import { TransactionForm } from '../components/TransactionForm';
 import type { TransactionSchema } from '../validation/transaction.schema';
+import type { PartnerContributionEntry } from '../types/transaction.types';
 import { usePaymentSources } from '@/features/finance/payment-sources/hooks/usePaymentSources';
 
 export function CreateTransactionPage() {
@@ -30,9 +31,9 @@ export function CreateTransactionPage() {
     ]);
   }, [setItems, t]);
 
-  async function handleSubmit(values: TransactionSchema) {
+  async function handleSubmit(values: TransactionSchema, contributions: PartnerContributionEntry[]) {
     clearError();
-    const record = await createTransaction(values);
+    const record = await createTransaction({ ...values, partnerContributions: contributions });
     if (record) {
       toast.success(t('transaction.createTransaction'));
       navigate(`${ROUTE_PATHS.TRANSACTIONS}/${record.id}`);

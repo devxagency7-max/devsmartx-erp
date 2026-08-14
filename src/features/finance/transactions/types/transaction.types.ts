@@ -51,6 +51,12 @@ export interface AttachmentRef {
   mimeType: string;
 }
 
+export interface PartnerContributionEntry {
+  personId: string;
+  personName: string;
+  amount: number;
+}
+
 /** Shape used by the create/edit form. */
 export interface TransactionFormInput {
   type: TransactionType;
@@ -65,6 +71,7 @@ export interface TransactionFormInput {
   description: string;
   notes: string;
   transactionDate: string;
+  partnerContributions?: PartnerContributionEntry[];
 }
 
 /** Filters for the transaction list. */
