@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Phase 19 — Simple Glass Enterprise + Gen-Z SaaS */
+    --background: 220 33% 98%;       /* #F8FAFC */
+    --foreground: 222 47% 11%;       /* deep navy text */
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 239 83% 67%;          /* #6366F1 indigo */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 6% 96%;
+    --secondary-foreground: 239 83% 50%;
+    --muted: 220 20% 94%;
+    --muted-foreground: 220 13% 50%;
+    --accent: 270 76% 60%;           /* #8B5CF6 violet */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 20% 89%;
+    --input: 220 20% 89%;
+    --ring: 239 83% 67%;
+    --radius: 0.75rem;
+
+    /* Layout */
+    --sidebar-width: 240px;
+    --sidebar-collapsed-width: 64px;
+    --topbar-height: 56px;
+
+    /* Glass surfaces */
+    --glass-bg: 0 0% 100% / 0.7;
+    --glass-border: 220 20% 89% / 0.6;
+    --glass-blur: 12px;
+
+    /* Semantic colours */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 201 94% 44%;
+    --info-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    /* Dark: deep navy #070B14 base */
+    --background: 225 46% 5%;        /* #070B14 */
+    --foreground: 214 40% 92%;
+    --card: 223 45% 8%;              /* #0F172A */
+    --card-foreground: 214 40% 92%;
+    --popover: 223 45% 8%;
+    --popover-foreground: 214 40% 92%;
+    --primary: 239 83% 67%;          /* #6366F1 — same indigo in dark */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 223 45% 13%;
+    --secondary-foreground: 214 40% 92%;
+    --muted: 223 45% 13%;
+    --muted-foreground: 215 20% 55%;
+    --accent: 270 76% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 63% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 223 45% 14%;
+    --input: 223 45% 14%;
+    --ring: 239 83% 67%;
+
+    /* Glass surfaces (dark) */
+    --glass-bg: 223 45% 8% / 0.6;
+    --glass-border: 223 45% 20% / 0.5;
+
+    /* Semantic colours */
+    --success: 142 71% 40%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 201 94% 44%;
+    --info-foreground: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Glass utility */
+@layer utilities {
+  .glass {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid hsl(var(--glass-border));
+  }
+}

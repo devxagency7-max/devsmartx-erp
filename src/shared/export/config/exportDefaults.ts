@@ -1,0 +1,9 @@
+export const DEFAULT_DATE_FORMAT = 'yyyy-MM-dd';
+export const DEFAULT_DATETIME_FORMAT = 'yyyy-MM-dd HH:mm';
+export const DEFAULT_COMPANY_NAME = 'DevSmartX';
+export const DEFAULT_FREEZE_HEADER = true;
+export const DEFAULT_AUTO_WIDTH = true;
+export const MAX_ROWS_CLIENT_SIDE = 10_000;
+export const EXCEL_MAX_SHEET_NAME_LENGTH = 31;
+export const INVALID_SHEET_NAME_CHARS = /[\\/?*[\]:]/g;
+export const INVALID_FILE_NAME_CHARS = /[<>:"/\\|?*\x00-\x1F]/g;
