@@ -88,7 +88,7 @@ export default function CategoryListPage() {
         </select>
       </div>
 
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
+      <div className="rounded-xl border border-border bg-card overflow-hidden overflow-x-auto">
         {isLoading ? (
           <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">{t('common.loading')}</div>
         ) : categories.length === 0 ? (

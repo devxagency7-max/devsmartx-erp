@@ -299,7 +299,7 @@ export default function CommitmentDetailsPage() {
       )}
 
       {payments.length > 0 && (
-        <div className="rounded-xl border border-border bg-card overflow-hidden">
+        <div className="rounded-xl border border-border bg-card overflow-hidden overflow-x-auto">
           <div className="px-6 py-4 border-b border-border">
             <h2 className="text-base font-semibold text-foreground">{t('commitment.paymentHistory')}</h2>
           </div>

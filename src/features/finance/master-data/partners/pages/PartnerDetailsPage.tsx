@@ -119,7 +119,7 @@ export default function PartnerDetailsPage() {
       {ledgerEntries.length > 0 && (
         <div>
           <h2 className="text-base font-semibold text-foreground mb-3">سجل المعاملات</h2>
-          <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <div className="rounded-xl border border-border bg-card overflow-hidden overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 border-b border-border">
                 <tr>

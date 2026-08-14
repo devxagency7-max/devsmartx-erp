@@ -120,7 +120,7 @@ export function TransactionDetailsPage() {
       <Card>
         <CardContent className="pt-6">
           <SectionHeader title={t('transaction.transactionDetails')} className="pb-4" />
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm sm:grid-cols-3">
+          <dl className="grid grid-cols-1 gap-x-6 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
             <InfoRow label={t('transaction.referenceNumber')} value={<span className="font-mono text-xs">{tx.referenceNumber}</span>} />
             <InfoRow label={t('transaction.paymentSource')} value={tx.paymentSourceName} />
             {tx.destinationPaymentSourceName && (
@@ -190,7 +190,7 @@ export function TransactionDetailsPage() {
       <Card>
         <CardContent className="pt-6">
           <SectionHeader title={t('paymentSource.auditInfo')} className="pb-4" />
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm sm:grid-cols-3">
+          <dl className="grid grid-cols-1 gap-x-6 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
             <InfoRow label={t('transaction.createdAt')} value={new Date(tx.createdAt).toLocaleString()} />
             <InfoRow label={t('transaction.updatedAt')} value={new Date(tx.updatedAt).toLocaleString()} />
             <InfoRow label={t('transaction.createdBy')} value={tx.createdBy} />
