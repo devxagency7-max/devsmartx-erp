@@ -3,6 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Eye, Pencil, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { usePersonLedger } from '@/features/finance/people/hooks/usePeople';
+import { derivePersonBalances } from '@/features/finance/people/utils/personHelpers';
+import { formatAmount } from '@/features/finance/transactions/utils/formatAmount';
+import type { CurrencyCode } from '@/shared/types/currency';
 import { useBreadcrumb } from '@/shared/layout/BreadcrumbContext';
 import { ROUTE_PATHS } from '@/app/router/constants';
 import { ExportButton, useExcelExport, generateFileName, sanitizeSheetName } from '@/shared/export';
@@ -10,6 +14,36 @@ import { getPartnerExportColumns } from '../export/partnerExportColumns';
 import { usePartners, usePartnerActions } from '../hooks/usePartners';
 import { usePartnerStore } from '../store/partnerStore';
 import { StatusBadge } from '../../shared/components/StatusBadge';
+
+function PartnerBalance({ partnerId }: { partnerId: string }) {
+  const { data: entries = [], isLoading } = usePersonLedger(partnerId);
+  if (isLoading) return <span className="text-muted-foreground text-xs">…</span>;
+  const balances = derivePersonBalances(entries);
+  if (balances.length === 0) return <span className="text-muted-foreground text-xs">—</span>;
+  return (
+    <div className="space-y-0.5">
+      {balances.map((b) => (
+        <div key={b.currency} className="flex items-center gap-1.5">
+          <span className={`text-xs font-mono font-medium ${
+            b.direction === 'PERSON_OWES_COMPANY' ? 'text-destructive' :
+            b.direction === 'COMPANY_OWES_PERSON' ? 'text-green-500' :
+            'text-muted-foreground'
+          }`}>
+            {formatAmount(b.netAmount, b.currency as CurrencyCode)}
+          </span>
+          <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
+            b.direction === 'PERSON_OWES_COMPANY' ? 'bg-destructive/10 text-destructive' :
+            b.direction === 'COMPANY_OWES_PERSON' ? 'bg-green-500/10 text-green-500' :
+            'bg-muted text-muted-foreground'
+          }`}>
+            {b.direction === 'PERSON_OWES_COMPANY' ? 'مدين' :
+             b.direction === 'COMPANY_OWES_PERSON' ? 'دائن' : 'صفر'}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function PartnersListPage() {
   const { t, i18n } = useTranslation();
@@ -103,6 +137,7 @@ export default function PartnersListPage() {
                 <th className="px-4 py-3 text-start font-medium text-muted-foreground">{t('masterData.partners.email')}</th>
                 <th className="px-4 py-3 text-start font-medium text-muted-foreground">{t('masterData.partners.phone')}</th>
                 <th className="px-4 py-3 text-start font-medium text-muted-foreground">{t('masterData.fields.status')}</th>
+                <th className="px-4 py-3 text-start font-medium text-muted-foreground">الرصيد</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -114,6 +149,7 @@ export default function PartnersListPage() {
                   <td className="px-4 py-3 text-muted-foreground">{p.email}</td>
                   <td className="px-4 py-3 text-muted-foreground">{p.phone || '—'}</td>
                   <td className="px-4 py-3"><StatusBadge status={p.status} /></td>
+                  <td className="px-4 py-3"><PartnerBalance partnerId={p.id} /></td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
                       <button onClick={() => navigate(ROUTE_PATHS.PARTNER_DETAILS.replace(':id', p.id))} className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"><Eye className="h-4 w-4" /></button>
