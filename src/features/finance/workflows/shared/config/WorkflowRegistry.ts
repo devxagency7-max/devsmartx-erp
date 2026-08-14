@@ -18,7 +18,6 @@ export const EXPENSE_WORKFLOW: FinancialWorkflowDefinition = {
   queryKey: ['expenses'],
   extraDefaults: { vendor: '' },
   steps: [
-    { id: 'category',     labelKey: 'expense.wizard.steps.category',    showInIndicator: true  },
     { id: 'paymentSource', labelKey: 'expense.wizard.steps.paymentSource', showInIndicator: true  },
     { id: 'payment',      labelKey: 'expense.wizard.steps.payment',      showInIndicator: true  },
     { id: 'details',               labelKey: 'expense.wizard.steps.details',               showInIndicator: true  },

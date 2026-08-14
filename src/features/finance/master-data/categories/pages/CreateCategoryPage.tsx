@@ -12,7 +12,9 @@ import { categorySchema, categoryDefaultValues, type CategoryFormValues } from '
 import { ColorDot } from '../../shared/components/ColorDot';
 
 const COLOR_PRESETS = ['#EF4444','#F59E0B','#22C55E','#3B82F6','#8B5CF6','#EC4899','#06B6D4','#6366F1'];
-const TRANSACTION_TYPES = Object.values(TransactionType);
+const TRANSACTION_TYPES = Object.values(TransactionType).filter(
+  (t) => t !== TransactionType.PartnerContribution && t !== TransactionType.OpeningBalance,
+);
 
 export default function CreateCategoryPage() {
   const { t } = useTranslation();

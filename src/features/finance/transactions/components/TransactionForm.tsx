@@ -22,7 +22,7 @@ import { PartnerContributionsSection } from './PartnerContributionsSection';
 import type { CurrencyCode, PartnerContributionEntry } from '../types/transaction.types';
 
 const TX_TYPES = Object.values(TransactionType).filter(
-  (t) => t !== TransactionType.OpeningBalance,
+  (t) => t !== TransactionType.OpeningBalance && t !== TransactionType.PartnerContribution,
 );
 const PAYMENT_METHODS = Object.values(PaymentMethod);
 const CURRENCIES: CurrencyCode[] = ['EGP', 'USD', 'EUR', 'SAR', 'AED'];

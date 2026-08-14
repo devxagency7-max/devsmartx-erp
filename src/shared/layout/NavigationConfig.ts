@@ -125,20 +125,11 @@ export const navigationConfig: NavItem[] = [
         key: 'masterData',
         label: 'Master Data',
         icon: Database,
-        path: ROUTE_PATHS.CATEGORIES,
+        path: ROUTE_PATHS.TAGS,
         permission: null,
         featureFlag: 'finance',
         group: 'modules',
         children: [
-          {
-            key: 'categories',
-            label: 'Categories',
-            icon: Tag,
-            path: ROUTE_PATHS.CATEGORIES,
-            permission: null,
-            featureFlag: 'finance',
-            group: 'modules',
-          },
           {
             key: 'tags',
             label: 'Tags',

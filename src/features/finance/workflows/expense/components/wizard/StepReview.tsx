@@ -36,7 +36,6 @@ export function StepReview({ data, isFirstStep, onSuccess, onBack, onCancel }: S
   const contributions = data.partnerContributions ?? [];
 
   const reviewRows = [
-    { label: t('transaction.category'), value: data.categoryName },
     { label: t('transaction.paymentSource'), value: data.paymentSourceName },
     { label: t('transaction.paymentMethod'), value: t(`transaction.pm_${data.paymentMethod}`) },
     { label: t('transaction.amount'), value: formatAmount(data.amount as number, data.currency as CurrencyCode) },

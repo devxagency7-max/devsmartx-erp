@@ -4,7 +4,6 @@ import { FinancialWizardLayout } from '@/features/finance/workflows/shared/compo
 import { WorkflowCompleteScreen } from '@/features/finance/workflows/shared/components/WorkflowCompleteScreen';
 import { EXPENSE_WORKFLOW } from '@/features/finance/workflows/shared/config/WorkflowRegistry';
 import { ROUTE_PATHS } from '@/app/router/constants';
-import { StepCategory } from './wizard/StepCategory';
 import { StepWallet } from './wizard/StepWallet';
 import { StepPayment } from './wizard/StepPayment';
 import { StepDetails } from './wizard/StepDetails';
@@ -63,7 +62,6 @@ export function ExpenseWizard() {
       isConfirmation={isConfirmation}
       onExitRequest={handleExit}
     >
-      {currentStepId === 'category'     && <StepCategory    {...stepProps} />}
       {currentStepId === 'paymentSource' && <StepWallet      {...stepProps} />}
       {currentStepId === 'payment'      && <StepPayment     {...stepProps} />}
       {currentStepId === 'details'      && <StepDetails     {...stepProps} />}
