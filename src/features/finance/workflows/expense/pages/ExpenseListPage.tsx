@@ -113,7 +113,7 @@ export function ExpenseListPage() {
                   <tr className="border-b border-[hsl(var(--border))] bg-[hsl(var(--muted))]/40">
                     <th className="px-4 py-3 text-left font-medium text-[hsl(var(--muted-foreground))]">{t('transaction.referenceNumber')}</th>
                     <th className="px-4 py-3 text-left font-medium text-[hsl(var(--muted-foreground))]">{t('transaction.category')}</th>
-                    <th className="px-4 py-3 text-left font-medium text-[hsl(var(--muted-foreground))]">{t('transaction.wallet')}</th>
+                    <th className="px-4 py-3 text-left font-medium text-[hsl(var(--muted-foreground))]">{t('transaction.paymentSource')}</th>
                     <th className="px-4 py-3 text-right font-medium text-[hsl(var(--muted-foreground))]">{t('transaction.amount')}</th>
                     <th className="px-4 py-3 text-left font-medium text-[hsl(var(--muted-foreground))]">{t('transaction.paymentMethod')}</th>
                     <th className="px-4 py-3 text-left font-medium text-[hsl(var(--muted-foreground))]">{t('transaction.status')}</th>

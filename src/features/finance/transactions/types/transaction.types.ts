@@ -71,6 +71,7 @@ export interface TransactionFormInput {
   currency: CurrencyCode;
   paymentMethod: PaymentMethod;
   categoryId: string;
+  categoryName?: string;
   description: string;
   notes: string;
   transactionDate: string;

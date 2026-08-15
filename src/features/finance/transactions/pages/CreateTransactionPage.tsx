@@ -13,6 +13,7 @@ import type { TransactionSchema } from '../validation/transaction.schema';
 import type { PartnerContributionEntry } from '../types/transaction.types';
 import type { UploadResult } from '@/shared/upload';
 import { usePaymentSources } from '@/features/finance/payment-sources/hooks/usePaymentSources';
+import { useCategories } from '@/features/finance/master-data/categories/hooks/useCategories';
 
 export function CreateTransactionPage() {
   const { t } = useTranslation();
@@ -21,6 +22,7 @@ export function CreateTransactionPage() {
   const { setItems } = useBreadcrumb();
   const { createTransaction, isLoading, error, clearError } = useCreateTransaction();
   const { paymentSources } = usePaymentSources();
+  const { data: categories = [] } = useCategories();
 
   const presetType = (searchParams.get('type') as TransactionType) ?? TransactionType.Expense;
 
@@ -34,7 +36,8 @@ export function CreateTransactionPage() {
 
   async function handleSubmit(values: TransactionSchema, contributions: PartnerContributionEntry[], attachments: UploadResult[], allPartners: { personId: string; personName: string }[]) {
     clearError();
-    const record = await createTransaction({ ...values, partnerContributions: contributions, allPartners, attachments });
+    const categoryName = categories.find((c) => c.id === values.categoryId)?.name;
+    const record = await createTransaction({ ...values, categoryName, partnerContributions: contributions, allPartners, attachments });
     if (record) {
       toast.success(t('transaction.createTransaction'));
       navigate(`${ROUTE_PATHS.TRANSACTIONS}/${record.id}`);

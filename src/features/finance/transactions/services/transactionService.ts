@@ -122,7 +122,7 @@ export const transactionService = {
       currency: input.currency,
       paymentMethod: input.paymentMethod,
       categoryId: input.categoryId || null,
-      categoryName: null,
+      categoryName: input.categoryName || null,
       description: input.description,
       notes: input.notes,
       attachments: (input.attachments ?? []).map((a) => ({
