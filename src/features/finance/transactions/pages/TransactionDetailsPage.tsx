@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Pencil, Paperclip, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Pencil, X, Download, FileText } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Skeleton } from '@/shared/components/ui/skeleton';
@@ -20,9 +20,16 @@ import { TransactionStatusBadge } from '../components/TransactionStatusBadge';
 import { TransactionActionsMenu } from '../components/TransactionActionsMenu';
 import { formatAmount } from '../utils/formatAmount';
 
+interface AttachmentPreview {
+  fileUrl: string;
+  fileName: string;
+  mimeType: string;
+}
+
 export function TransactionDetailsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [preview, setPreview] = useState<AttachmentPreview | null>(null);
   const { id } = useParams<{ id: string }>();
   const { transaction: tx, isLoading, isError, error } = useTransaction(id ?? '');
   const { setItems } = useBreadcrumb();
@@ -170,34 +177,86 @@ export function TransactionDetailsPage() {
               {tx.attachments.map((att) => {
                 const isImage = att.mimeType?.startsWith('image/');
                 return (
-                  <a
+                  <button
                     key={att.id}
-                    href={att.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group relative flex flex-col overflow-hidden rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--muted))]/30 hover:border-[hsl(var(--primary))]/50 transition-colors"
+                    type="button"
+                    onClick={() => setPreview({ fileUrl: att.fileUrl, fileName: att.fileName, mimeType: att.mimeType })}
+                    className="group flex flex-col overflow-hidden rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--muted))]/30 hover:border-[hsl(var(--primary))]/60 hover:shadow-md transition-all text-start"
                   >
                     {isImage ? (
-                      <img
-                        src={att.fileUrl}
-                        alt={att.fileName}
-                        className="h-32 w-full object-cover"
-                      />
+                      <img src={att.fileUrl} alt={att.fileName} className="h-32 w-full object-cover" />
                     ) : (
-                      <div className="flex h-32 items-center justify-center">
-                        <Paperclip size={28} className="text-[hsl(var(--muted-foreground))]" />
+                      <div className="flex h-32 w-full flex-col items-center justify-center gap-2 bg-[hsl(var(--muted))]/50">
+                        <FileText size={32} className="text-[hsl(var(--primary))]/60" />
+                        <span className="text-[10px] uppercase tracking-wide text-[hsl(var(--muted-foreground))]">
+                          {att.mimeType?.split('/')[1] ?? 'file'}
+                        </span>
                       </div>
                     )}
-                    <div className="flex items-center justify-between gap-1 px-2 py-1.5">
-                      <span className="truncate text-xs text-[hsl(var(--foreground))]">{att.fileName}</span>
-                      <ExternalLink size={11} className="shrink-0 text-[hsl(var(--muted-foreground))] group-hover:text-[hsl(var(--primary))]" />
+                    <div className="px-2 py-1.5">
+                      <span className="block truncate text-xs text-[hsl(var(--foreground))]">{att.fileName}</span>
                     </div>
-                  </a>
+                  </button>
                 );
               })}
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Lightbox */}
+      {preview && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          onClick={() => setPreview(null)}
+        >
+          <div
+            className="relative max-h-[90vh] max-w-4xl w-full rounded-xl overflow-hidden bg-[hsl(var(--card))] shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-[hsl(var(--border))] px-4 py-3">
+              <span className="truncate text-sm font-medium text-[hsl(var(--foreground))]">{preview.fileName}</span>
+              <div className="flex items-center gap-2">
+                <a
+                  href={preview.fileUrl}
+                  download={preview.fileName}
+                  className="flex items-center gap-1.5 rounded-lg bg-[hsl(var(--primary))] px-3 py-1.5 text-xs font-medium text-white hover:bg-[hsl(var(--primary))]/90 transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Download size={13} /> تحميل
+                </a>
+                <button
+                  onClick={() => setPreview(null)}
+                  className="rounded-lg p-1.5 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))] hover:text-[hsl(var(--foreground))] transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex items-center justify-center overflow-auto p-4" style={{ maxHeight: 'calc(90vh - 56px)' }}>
+              {preview.mimeType?.startsWith('image/') ? (
+                <img src={preview.fileUrl} alt={preview.fileName} className="max-h-full max-w-full rounded-lg object-contain" />
+              ) : preview.mimeType === 'application/pdf' ? (
+                <iframe src={preview.fileUrl} title={preview.fileName} className="h-[70vh] w-full rounded-lg border-0" />
+              ) : (
+                <div className="flex flex-col items-center gap-4 py-12">
+                  <FileText size={64} className="text-[hsl(var(--muted-foreground))]" />
+                  <p className="text-sm text-[hsl(var(--muted-foreground))]">لا يمكن عرض هذا النوع من الملفات</p>
+                  <a
+                    href={preview.fileUrl}
+                    download={preview.fileName}
+                    className="flex items-center gap-2 rounded-lg bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-white hover:bg-[hsl(var(--primary))]/90"
+                  >
+                    <Download size={15} /> تحميل الملف
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Timeline placeholder */}
