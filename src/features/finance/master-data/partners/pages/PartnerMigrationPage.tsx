@@ -92,14 +92,15 @@ export default function PartnerMigrationPage() {
       const existingForTx = ledger.filter(e => e.transactionId === tx.id);
       const existingPersonIds = new Set(existingForTx.map(e => e.personId));
 
-      const totalPartners = tx.allPartners.length || tx.contribs.length;
-      const equalShare = tx.contribs[0]?.equalShare
-        ?? Math.round((tx.amount / totalPartners) * 100) / 100;
+      // If allPartners is empty (old transaction), fall back to ALL active partners
+      const effectiveAllPartners = tx.allPartners.length > 0 ? tx.allPartners : partners.map(p => ({ personId: p.id, personName: p.name }));
+      const totalPartners = effectiveAllPartners.length || tx.contribs.length;
+      const equalShare = Math.round((tx.amount / totalPartners) * 100) / 100;
 
-      addLog(`\nProcessing TX ${tx.ref}: equalShare=${equalShare}, totalPartners=${totalPartners}`);
+      addLog(`\nProcessing TX ${tx.ref}: equalShare=${equalShare}, totalPartners=${totalPartners}, allPartnersSource=${tx.allPartners.length > 0 ? 'tx' : 'fallback-all'}`);
 
       const paidIds = new Set(tx.contribs.map(c => c.personId));
-      const unpaidPartners = tx.allPartners.filter(p => !paidIds.has(p.personId));
+      const unpaidPartners = effectiveAllPartners.filter(p => !paidIds.has(p.personId));
       const totalUnpaidShare = unpaidPartners.length * equalShare;
       const extraPerPayer = tx.contribs.length > 0
         ? Math.round((totalUnpaidShare / tx.contribs.length) * 100) / 100
