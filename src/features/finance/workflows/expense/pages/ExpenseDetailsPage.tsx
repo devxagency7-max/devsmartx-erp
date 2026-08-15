@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Pencil, Clock } from 'lucide-react';
+import { ArrowLeft, Pencil, Clock, FileText, FileSpreadsheet, File, ImageIcon, ExternalLink } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Skeleton } from '@/shared/components/ui/skeleton';
@@ -123,20 +123,47 @@ export function ExpenseDetailsPage() {
         <CardContent className="pt-6">
           <SectionHeader title={t('transaction.attachments')} />
           {exp.attachments.length === 0 ? (
-            <p className="text-sm text-[hsl(var(--muted-foreground))]">{t('transaction.attachmentsPlaceholder')}</p>
+            <p className="text-sm text-[hsl(var(--muted-foreground))]">لا توجد مرفقات</p>
           ) : (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {exp.attachments.map((a) => (
-                <a
-                  key={a.id}
-                  href={a.fileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="truncate rounded border border-[hsl(var(--border))] p-2 text-xs hover:bg-[hsl(var(--muted))]"
-                >
-                  {a.fileName}
-                </a>
-              ))}
+            <div className="space-y-3">
+              {exp.attachments.map((a) => {
+                const isImage = a.mimeType?.startsWith('image/');
+                const isPdf = a.mimeType === 'application/pdf';
+                const isExcel = a.mimeType?.includes('excel') || a.mimeType?.includes('spreadsheet');
+                return (
+                  <div key={a.id} className="rounded-xl border border-[hsl(var(--border))] overflow-hidden">
+                    {isImage && (
+                      <div className="bg-[hsl(var(--muted))]/30 flex items-center justify-center max-h-64 overflow-hidden">
+                        <img
+                          src={a.fileUrl}
+                          alt={a.fileName}
+                          className="max-h-64 w-full object-contain"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 px-4 py-3">
+                      <div className="shrink-0 text-[hsl(var(--muted-foreground))]">
+                        {isImage ? <ImageIcon className="h-5 w-5 text-[hsl(var(--primary))]" />
+                          : isPdf ? <FileText className="h-5 w-5 text-red-500" />
+                          : isExcel ? <FileSpreadsheet className="h-5 w-5 text-green-600" />
+                          : <File className="h-5 w-5" />}
+                      </div>
+                      <span className="flex-1 truncate text-sm font-medium">{a.fileName}</span>
+                      <a
+                        href={a.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary))]/20 transition-colors"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        فتح
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </CardContent>
