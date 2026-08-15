@@ -199,6 +199,7 @@ export const transactionService = {
     if (input.notes !== undefined) updates.notes = input.notes;
     if (input.transactionDate) updates.transactionDate = input.transactionDate;
     if (input.allPartners !== undefined) updates.allPartners = input.allPartners;
+    if (input.partnerContributions !== undefined) updates.partnerContributions = input.partnerContributions;
 
     await updateDoc(ref, updates);
     return docToRecord(id, { ...snap.data(), ...updates });

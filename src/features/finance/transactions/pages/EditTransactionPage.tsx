@@ -56,7 +56,10 @@ export function EditTransactionPage() {
     setSaveError(null);
     try {
       const categoryName = categories.find((c) => c.id === values.categoryId)?.name;
-      await transactionService.update(id, { ...values, categoryName, allPartners });
+      const totalPartners = allPartners.length || contributions.length;
+      const equalShare = totalPartners > 0 ? Math.round((values.amount / totalPartners) * 100) / 100 : 0;
+      const contribsWithShare = contributions.map((c) => ({ ...c, equalShare }));
+      await transactionService.update(id, { ...values, categoryName, allPartners, partnerContributions: contribsWithShare });
 
       // Re-write ledger entries for this transaction if it has contributions
       if (contributions.length > 0 && values.type === TransactionType.Expense) {
