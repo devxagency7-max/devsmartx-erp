@@ -37,56 +37,52 @@ export function useCreateTransaction() {
         const equalShare = Math.round((input.amount / totalPartners) * 100) / 100;
 
         const paidIds = new Set(contributions.map((c) => c.personId));
+        const unpaidPartners = allPartners.filter((p) => !paidIds.has(p.personId));
 
-        // Ledger entries for partners who contributed (paid something)
-        const paidEntries = contributions.map((contribution) => {
-          const partnerPaid = contribution.amount;
-          if (partnerPaid > equalShare) {
-            const owedBack = Math.round((partnerPaid - equalShare) * 100) / 100;
-            return personService.addLedgerEntry({
-              personId: contribution.personId,
-              direction: 'COMPANY_OWES_PERSON',
-              amount: owedBack,
-              currency: input.currency,
-              reason: `مساهمة في مصروف: ${input.description}`,
-              categoryId: input.categoryId || null,
-              transactionId: record.id,
-              date: input.transactionDate,
-              notes: `مصروف ${record.referenceNumber} — دفع ${contribution.personName} ${partnerPaid} من أصل ${input.amount}`,
-            });
-          } else if (partnerPaid < equalShare) {
-            const owes = Math.round((equalShare - partnerPaid) * 100) / 100;
-            return personService.addLedgerEntry({
-              personId: contribution.personId,
-              direction: 'PERSON_OWES_COMPANY',
-              amount: owes,
-              currency: input.currency,
-              reason: `نصيب في مصروف: ${input.description}`,
-              categoryId: input.categoryId || null,
-              transactionId: record.id,
-              date: input.transactionDate,
-              notes: `مصروف ${record.referenceNumber} — نصيب ${contribution.personName} ${equalShare} دفع ${partnerPaid}`,
-            });
-          }
-          return Promise.resolve();
+        // Total owed back to payers from unpaid partners' shares
+        // Each unpaid partner's share gets split equally among payers
+        const totalUnpaidShare = unpaidPartners.length * equalShare;
+        const extraPerPayer = contributions.length > 0
+          ? Math.round((totalUnpaidShare / contributions.length) * 100) / 100
+          : 0;
+
+        // Single entry per payer: (paid - equalShare) + share of unpaid partners
+        const paidEntries = contributions.map((c) => {
+          const overpaid = Math.round((c.amount - equalShare) * 100) / 100;
+          // net = what they overpaid + what they're owed from unpaid partners
+          const net = Math.round((overpaid + extraPerPayer) * 100) / 100;
+
+          if (Math.abs(net) < 0.01) return Promise.resolve();
+
+          return personService.addLedgerEntry({
+            personId: c.personId,
+            direction: net > 0 ? 'COMPANY_OWES_PERSON' : 'PERSON_OWES_COMPANY',
+            amount: Math.abs(net),
+            currency: input.currency,
+            reason: net > 0
+              ? `مساهمة زائدة في مصروف: ${input.description}`
+              : `نصيب في مصروف: ${input.description}`,
+            categoryId: input.categoryId || null,
+            transactionId: record.id,
+            date: input.transactionDate,
+            notes: `مصروف ${record.referenceNumber} — دفع ${c.personName} ${c.amount}، نصيبه ${equalShare}، إضافي من غير الدافعين ${extraPerPayer}`,
+          });
         });
 
-        // Ledger entries for partners who paid nothing (in allPartners but not in contributions)
-        const unpaidEntries = allPartners
-          .filter((p) => !paidIds.has(p.personId))
-          .map((p) =>
-            personService.addLedgerEntry({
-              personId: p.personId,
-              direction: 'PERSON_OWES_COMPANY',
-              amount: equalShare,
-              currency: input.currency,
-              reason: `نصيب في مصروف: ${input.description}`,
-              categoryId: input.categoryId || null,
-              transactionId: record.id,
-              date: input.transactionDate,
-              notes: `مصروف ${record.referenceNumber} — نصيب ${p.personName} ${equalShare} — لم يدفع شيئاً`,
-            }),
-          );
+        // Entry per unpaid partner: owes full equal share
+        const unpaidEntries = unpaidPartners.map((p) =>
+          personService.addLedgerEntry({
+            personId: p.personId,
+            direction: 'PERSON_OWES_COMPANY',
+            amount: equalShare,
+            currency: input.currency,
+            reason: `نصيب في مصروف: ${input.description}`,
+            categoryId: input.categoryId || null,
+            transactionId: record.id,
+            date: input.transactionDate,
+            notes: `مصروف ${record.referenceNumber} — نصيب ${p.personName} ${equalShare} — لم يدفع شيئاً`,
+          }),
+        );
 
         await Promise.all([...paidEntries, ...unpaidEntries]);
         await queryClient.invalidateQueries({ queryKey: ['people'] });

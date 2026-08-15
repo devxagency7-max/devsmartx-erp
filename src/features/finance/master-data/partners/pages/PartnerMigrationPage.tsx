@@ -98,48 +98,55 @@ export default function PartnerMigrationPage() {
 
       addLog(`\nProcessing TX ${tx.ref}: equalShare=${equalShare}, totalPartners=${totalPartners}`);
 
-      // Partners who paid
+      const paidIds = new Set(tx.contribs.map(c => c.personId));
+      const unpaidPartners = tx.allPartners.filter(p => !paidIds.has(p.personId));
+      const totalUnpaidShare = unpaidPartners.length * equalShare;
+      const extraPerPayer = tx.contribs.length > 0
+        ? Math.round((totalUnpaidShare / tx.contribs.length) * 100) / 100
+        : 0;
+
+      addLog(`  unpaid=${unpaidPartners.map(p=>p.personName).join(',')} totalUnpaidShare=${totalUnpaidShare} extraPerPayer=${extraPerPayer}`);
+
+      // Single entry per paying partner
       for (const c of tx.contribs) {
         if (existingPersonIds.has(c.personId)) {
-          addLog(`  SKIP ${c.personName} (${c.personId}) — ledger entry exists`);
+          addLog(`  SKIP ${c.personName} — exists`);
           skipped++;
           continue;
         }
-        const diff = Math.round((c.amount - equalShare) * 100) / 100;
-        if (Math.abs(diff) < 0.01) {
-          addLog(`  SKIP ${c.personName} — settled (paid exactly equalShare)`);
+        const overpaid = Math.round((c.amount - equalShare) * 100) / 100;
+        const net = Math.round((overpaid + extraPerPayer) * 100) / 100;
+        if (Math.abs(net) < 0.01) {
+          addLog(`  SKIP ${c.personName} — net=0, settled`);
           skipped++;
           continue;
         }
-        const direction = diff < 0 ? 'PERSON_OWES_COMPANY' : 'COMPANY_OWES_PERSON';
-        const amount = Math.abs(diff);
+        const direction = net > 0 ? 'COMPANY_OWES_PERSON' : 'PERSON_OWES_COMPANY';
         const data = {
           personId: c.personId,
           direction,
-          amount,
+          amount: Math.abs(net),
           currency: tx.currency,
-          reason: direction === 'PERSON_OWES_COMPANY' ? `نصيب في مصروف: ${tx.description}` : `مساهمة في مصروف: ${tx.description}`,
+          reason: net > 0 ? `مساهمة زائدة في مصروف: ${tx.description}` : `نصيب في مصروف: ${tx.description}`,
           categoryId: null,
           transactionId: tx.id,
           relatedProjectId: null,
           reference: generateRef(),
           date: tx.date,
           status: 'Pending',
-          notes: `${tx.ref} — دفع ${c.personName} ${c.amount}، نصيبه ${equalShare}`,
+          notes: `${tx.ref} — دفع ${c.personName} ${c.amount}، نصيبه ${equalShare}، إضافي ${extraPerPayer}`,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
         await addDoc(collection(db, 'personLedger'), data);
-        addLog(`  WROTE ${c.personName} (${c.personId}): ${direction} ${amount}`);
+        addLog(`  WROTE ${c.personName}: ${direction} ${Math.abs(net)}`);
         written++;
       }
 
-      // Partners who didn't pay (in allPartners only)
-      const paidIds = new Set(tx.contribs.map(c => c.personId));
-      for (const p of tx.allPartners) {
-        if (paidIds.has(p.personId)) continue;
+      // Entry per unpaid partner
+      for (const p of unpaidPartners) {
         if (existingPersonIds.has(p.personId)) {
-          addLog(`  SKIP ${p.personName} (${p.personId}) — ledger entry exists`);
+          addLog(`  SKIP ${p.personName} — exists`);
           skipped++;
           continue;
         }
@@ -160,7 +167,7 @@ export default function PartnerMigrationPage() {
           updatedAt: new Date().toISOString(),
         };
         await addDoc(collection(db, 'personLedger'), data);
-        addLog(`  WROTE ${p.personName} (${p.personId}): PERSON_OWES_COMPANY ${equalShare}`);
+        addLog(`  WROTE ${p.personName}: PERSON_OWES_COMPANY ${equalShare}`);
         written++;
       }
     }
