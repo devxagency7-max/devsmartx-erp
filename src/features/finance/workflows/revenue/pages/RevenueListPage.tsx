@@ -71,7 +71,7 @@ export default function RevenueListPage() {
               isDisabled={revenues.length === 0}
               isExporting={isExporting}
             />
-            <Button onClick={() => navigate(ROUTE_PATHS.REVENUES_NEW)}>
+            <Button onClick={() => navigate(`${ROUTE_PATHS.REVENUES_NEW}?type=Revenue`)}>
               {t('workflow.revenue.submit')}
             </Button>
           </>
@@ -110,7 +110,7 @@ export default function RevenueListPage() {
           title={t('transaction.noTransactions')}
           description={t('transaction.noTransactionsDesc')}
           action={
-            <Button onClick={() => navigate(ROUTE_PATHS.REVENUES_NEW)}>
+            <Button onClick={() => navigate(`${ROUTE_PATHS.REVENUES_NEW}?type=Revenue`)}>
               {t('workflow.revenue.submit')}
             </Button>
           }

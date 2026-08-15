@@ -104,8 +104,9 @@ export const dashboardRoutes = [
   { path: ROUTE_PATHS.PERSON_SETTLEMENT, Component: lazy(() => import('@/features/finance/people/pages/CreateSettlementPage')) },
   // Finance — Overview
   { path: ROUTE_PATHS.FINANCE_OVERVIEW, Component: lazy(() => import('@/features/finance/overview/pages/FinanceOverviewPage')) },
-  // Finance — Workflows — Revenue (list)
+  // Finance — Workflows — Revenue
   { path: ROUTE_PATHS.REVENUES, Component: lazy(() => import('@/features/finance/workflows/revenue/pages/RevenueListPage')) },
+  { path: ROUTE_PATHS.REVENUES_NEW, Component: lazy(() => import('@/features/finance/transactions/pages/CreateTransactionPage').then(m => ({ default: m.CreateTransactionPage }))) },
   // System
   { path: ROUTE_PATHS.SETTINGS, Component: lazy(() => import('@/shared/pages/SettingsPage')) },
   { path: ROUTE_PATHS.SYSTEM_USERS, Component: lazy(() => import('@/shared/pages/SystemUsersPage')) },
