@@ -3,26 +3,26 @@
 
 @layer base {
   :root {
-    /* Phase 19 — Simple Glass Enterprise + Gen-Z SaaS */
-    --background: 220 33% 98%;       /* #F8FAFC */
+    /* Light mode — clean modern SaaS */
+    --background: 226 30% 95%;       /* soft blue-grey page bg */
     --foreground: 222 47% 11%;       /* deep navy text */
-    --card: 0 0% 100%;
+    --card: 0 0% 100%;               /* pure white cards */
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 239 83% 67%;          /* #6366F1 indigo */
+    --primary: 239 84% 62%;          /* #5B5FED vivid indigo */
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 6% 96%;
-    --secondary-foreground: 239 83% 50%;
-    --muted: 220 20% 94%;
-    --muted-foreground: 220 13% 50%;
-    --accent: 270 76% 60%;           /* #8B5CF6 violet */
+    --secondary: 239 50% 95%;        /* light indigo tint */
+    --secondary-foreground: 239 84% 40%;
+    --muted: 220 22% 91%;            /* visible muted bg */
+    --muted-foreground: 220 14% 42%; /* readable muted text */
+    --accent: 270 76% 58%;           /* #8B5CF6 violet */
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 58%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 20% 89%;
-    --input: 220 20% 89%;
-    --ring: 239 83% 67%;
+    --border: 220 18% 84%;           /* visible borders */
+    --input: 220 18% 84%;
+    --ring: 239 84% 62%;
     --radius: 0.75rem;
 
     /* Layout */
@@ -31,16 +31,19 @@
     --topbar-height: 56px;
 
     /* Glass surfaces */
-    --glass-bg: 0 0% 100% / 0.7;
-    --glass-border: 220 20% 89% / 0.6;
+    --glass-bg: 0 0% 100% / 0.75;
+    --glass-border: 220 18% 84% / 0.6;
     --glass-blur: 12px;
 
+    /* Card shadow */
+    --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+
     /* Semantic colours */
-    --success: 142 71% 45%;
+    --success: 142 71% 40%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 38 92% 48%;
     --warning-foreground: 0 0% 100%;
-    --info: 201 94% 44%;
+    --info: 201 94% 40%;
     --info-foreground: 0 0% 100%;
   }
 
@@ -92,6 +95,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
 }
 
 /* Glass utility */
@@ -103,3 +107,4 @@
     border: 1px solid hsl(var(--glass-border));
   }
 }
+

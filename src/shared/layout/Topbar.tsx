@@ -59,7 +59,7 @@ export function Topbar({ onMenuClick }: Props) {
 
   return (
     <>
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-[hsl(var(--border))] bg-[hsl(var(--card))]/80 backdrop-blur-sm px-4">
+      <header className="flex h-14 shrink-0 items-center justify-between border-b border-[hsl(var(--border))] bg-[hsl(var(--card))]/80 backdrop-blur-sm px-4 shadow-[0_1px_3px_0_rgb(0,0,0,0.06)] dark:shadow-none">
         {/* Left: mobile menu + breadcrumb */}
         <div className="flex min-w-0 items-center gap-3">
           <button

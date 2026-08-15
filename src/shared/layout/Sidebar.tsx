@@ -221,6 +221,7 @@ export function Sidebar({ collapsed, onToggle }: Props) {
       className={cn(
         'flex flex-col h-full transition-[width] duration-200 ease-in-out',
         'border-e border-[hsl(var(--border))] bg-[hsl(var(--card))]',
+        'shadow-[1px_0_4px_0_rgb(0,0,0,0.06)] dark:shadow-none',
         collapsed ? 'w-16' : 'w-64',
       )}
       aria-label={t('nav.dashboard')}
