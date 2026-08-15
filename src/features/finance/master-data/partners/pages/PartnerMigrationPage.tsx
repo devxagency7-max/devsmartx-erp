@@ -102,11 +102,14 @@ export default function PartnerMigrationPage() {
       const paidIds = new Set(tx.contribs.map(c => c.personId));
       const unpaidPartners = effectiveAllPartners.filter(p => !paidIds.has(p.personId));
       const totalUnpaidShare = unpaidPartners.length * equalShare;
-      const extraPerPayer = tx.contribs.length > 0
-        ? Math.round((totalUnpaidShare / tx.contribs.length) * 100) / 100
+
+      // Only partners who paid >= their share can claim a portion of unpaid shares
+      const fullPayers = tx.contribs.filter(c => c.amount >= equalShare - 0.01);
+      const extraPerFullPayer = fullPayers.length > 0
+        ? Math.round((totalUnpaidShare / fullPayers.length) * 100) / 100
         : 0;
 
-      addLog(`  unpaid=${unpaidPartners.map(p=>p.personName).join(',')} totalUnpaidShare=${totalUnpaidShare} extraPerPayer=${extraPerPayer}`);
+      addLog(`  unpaid=${unpaidPartners.map(p=>p.personName).join(',')} totalUnpaidShare=${totalUnpaidShare} fullPayers=${fullPayers.map(c=>c.personName).join(',')} extraPerFullPayer=${extraPerFullPayer}`);
 
       // Single entry per paying partner
       for (const c of tx.contribs) {
@@ -115,27 +118,42 @@ export default function PartnerMigrationPage() {
           skipped++;
           continue;
         }
-        const overpaid = Math.round((c.amount - equalShare) * 100) / 100;
-        const net = Math.round((overpaid + extraPerPayer) * 100) / 100;
+        const paidFull = c.amount >= equalShare - 0.01;
+        let net: number;
+        let direction: string;
+        let reason: string;
+
+        if (paidFull) {
+          // Paid their share or more → company owes them back
+          const overpaid = Math.round((c.amount - equalShare) * 100) / 100;
+          net = Math.round((overpaid + extraPerFullPayer) * 100) / 100;
+          direction = 'COMPANY_OWES_PERSON';
+          reason = `مساهمة زائدة في مصروف: ${tx.description}`;
+        } else {
+          // Paid less than their share → they owe the company the difference
+          net = Math.round((equalShare - c.amount) * 100) / 100;
+          direction = 'PERSON_OWES_COMPANY';
+          reason = `نصيب في مصروف: ${tx.description}`;
+        }
+
         if (Math.abs(net) < 0.01) {
           addLog(`  SKIP ${c.personName} — net=0, settled`);
           skipped++;
           continue;
         }
-        const direction = net > 0 ? 'COMPANY_OWES_PERSON' : 'PERSON_OWES_COMPANY';
         const data = {
           personId: c.personId,
           direction,
           amount: Math.abs(net),
           currency: tx.currency,
-          reason: net > 0 ? `مساهمة زائدة في مصروف: ${tx.description}` : `نصيب في مصروف: ${tx.description}`,
+          reason,
           categoryId: null,
           transactionId: tx.id,
           relatedProjectId: null,
           reference: generateRef(),
           date: tx.date,
           status: 'Pending',
-          notes: `${tx.ref} — دفع ${c.personName} ${c.amount}، نصيبه ${equalShare}، إضافي ${extraPerPayer}`,
+          notes: `${tx.ref} — دفع ${c.personName} ${c.amount}، نصيبه ${equalShare}`,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };

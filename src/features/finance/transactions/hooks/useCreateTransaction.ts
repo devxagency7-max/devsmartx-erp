@@ -39,33 +39,42 @@ export function useCreateTransaction() {
         const paidIds = new Set(contributions.map((c) => c.personId));
         const unpaidPartners = allPartners.filter((p) => !paidIds.has(p.personId));
 
-        // Total owed back to payers from unpaid partners' shares
-        // Each unpaid partner's share gets split equally among payers
         const totalUnpaidShare = unpaidPartners.length * equalShare;
-        const extraPerPayer = contributions.length > 0
-          ? Math.round((totalUnpaidShare / contributions.length) * 100) / 100
+        // Only partners who paid >= their share can claim a portion of unpaid shares
+        const fullPayers = contributions.filter((c) => c.amount >= equalShare - 0.01);
+        const extraPerFullPayer = fullPayers.length > 0
+          ? Math.round((totalUnpaidShare / fullPayers.length) * 100) / 100
           : 0;
 
-        // Single entry per payer: (paid - equalShare) + share of unpaid partners
         const paidEntries = contributions.map((c) => {
-          const overpaid = Math.round((c.amount - equalShare) * 100) / 100;
-          // net = what they overpaid + what they're owed from unpaid partners
-          const net = Math.round((overpaid + extraPerPayer) * 100) / 100;
+          const paidFull = c.amount >= equalShare - 0.01;
+          let net: number;
+          let direction: 'COMPANY_OWES_PERSON' | 'PERSON_OWES_COMPANY';
+          let reason: string;
+
+          if (paidFull) {
+            const overpaid = Math.round((c.amount - equalShare) * 100) / 100;
+            net = Math.round((overpaid + extraPerFullPayer) * 100) / 100;
+            direction = 'COMPANY_OWES_PERSON';
+            reason = `مساهمة زائدة في مصروف: ${input.description}`;
+          } else {
+            net = Math.round((equalShare - c.amount) * 100) / 100;
+            direction = 'PERSON_OWES_COMPANY';
+            reason = `نصيب في مصروف: ${input.description}`;
+          }
 
           if (Math.abs(net) < 0.01) return Promise.resolve();
 
           return personService.addLedgerEntry({
             personId: c.personId,
-            direction: net > 0 ? 'COMPANY_OWES_PERSON' : 'PERSON_OWES_COMPANY',
+            direction,
             amount: Math.abs(net),
             currency: input.currency,
-            reason: net > 0
-              ? `مساهمة زائدة في مصروف: ${input.description}`
-              : `نصيب في مصروف: ${input.description}`,
+            reason,
             categoryId: input.categoryId || null,
             transactionId: record.id,
             date: input.transactionDate,
-            notes: `مصروف ${record.referenceNumber} — دفع ${c.personName} ${c.amount}، نصيبه ${equalShare}، إضافي من غير الدافعين ${extraPerPayer}`,
+            notes: `مصروف ${record.referenceNumber} — دفع ${c.personName} ${c.amount}، نصيبه ${equalShare}`,
           });
         });
 
