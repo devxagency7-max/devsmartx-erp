@@ -13,9 +13,13 @@ import { TransactionType } from '@/features/finance/domain/enums/TransactionType
 import { PaymentMethod } from '@/features/finance/domain/enums/PaymentMethod';
 import { useTransaction } from '../hooks/useTransaction';
 import { usePaymentSources } from '@/features/finance/payment-sources/hooks/usePaymentSources';
+import { useCategories } from '@/features/finance/master-data/categories/hooks/useCategories';
 import { transactionService } from '../services/transactionService';
+import { personService } from '@/features/finance/people/services/personService';
 import { TransactionForm } from '../components/TransactionForm';
 import type { TransactionSchema } from '../validation/transaction.schema';
+import type { PartnerContributionEntry } from '../types/transaction.types';
+import type { UploadResult } from '@/shared/upload';
 import { useQueryClient } from '@tanstack/react-query';
 import { TRANSACTIONS_QUERY_KEY } from '../hooks/useTransactions';
 
@@ -26,6 +30,7 @@ export function EditTransactionPage() {
   const queryClient = useQueryClient();
   const { transaction: tx, isLoading, isError, error: fetchError } = useTransaction(id ?? '');
   const { paymentSources } = usePaymentSources();
+  const { data: categories = [] } = useCategories();
   const { setItems } = useBreadcrumb();
 
   const [isSaving, setIsSaving] = React.useState(false);
@@ -40,14 +45,73 @@ export function EditTransactionPage() {
     ]);
   }, [setItems, t, tx?.referenceNumber, id]);
 
-  async function handleSubmit(values: TransactionSchema, _contributions: unknown, _attachments: unknown) {
-    void _contributions;
-    void _attachments;
+  async function handleSubmit(
+    values: TransactionSchema,
+    contributions: PartnerContributionEntry[],
+    _attachments: UploadResult[],
+    allPartners: { personId: string; personName: string }[],
+  ) {
     if (!id) return;
     setIsSaving(true);
     setSaveError(null);
     try {
-      await transactionService.update(id, values);
+      const categoryName = categories.find((c) => c.id === values.categoryId)?.name;
+      await transactionService.update(id, { ...values, categoryName, allPartners });
+
+      // Re-write ledger entries for this transaction if it has contributions
+      if (contributions.length > 0 && values.type === TransactionType.Expense) {
+        // Delete existing ledger entries for this transaction first
+        await personService.deleteLedgerEntriesByTransactionId(id);
+
+        const totalPartners = allPartners.length || contributions.length;
+        const equalShare = Math.round((values.amount / totalPartners) * 100) / 100;
+        const paidIds = new Set(contributions.map((c) => c.personId));
+        const unpaidPartners = allPartners.filter((p) => !paidIds.has(p.personId));
+        const totalUnpaidShare = unpaidPartners.length * equalShare;
+        const fullPayers = contributions.filter((c) => c.amount >= equalShare - 0.01);
+        const extraPerFullPayer = fullPayers.length > 0
+          ? Math.round((totalUnpaidShare / fullPayers.length) * 100) / 100
+          : 0;
+
+        const entries = [
+          ...contributions.map((c) => {
+            const paidFull = c.amount >= equalShare - 0.01;
+            const net = paidFull
+              ? Math.round((c.amount - equalShare + extraPerFullPayer) * 100) / 100
+              : Math.round((equalShare - c.amount) * 100) / 100;
+            if (Math.abs(net) < 0.01) return Promise.resolve();
+            return personService.addLedgerEntry({
+              personId: c.personId,
+              direction: paidFull ? 'COMPANY_OWES_PERSON' : 'PERSON_OWES_COMPANY',
+              amount: Math.abs(net),
+              currency: values.currency,
+              reason: paidFull
+                ? `مساهمة زائدة في مصروف: ${values.description}`
+                : `نصيب في مصروف: ${values.description}`,
+              categoryId: values.categoryId || null,
+              transactionId: id,
+              date: values.transactionDate,
+              notes: `مصروف — دفع ${c.personName} ${c.amount}، نصيبه ${equalShare}`,
+            });
+          }),
+          ...unpaidPartners.map((p) =>
+            personService.addLedgerEntry({
+              personId: p.personId,
+              direction: 'PERSON_OWES_COMPANY',
+              amount: equalShare,
+              currency: values.currency,
+              reason: `نصيب في مصروف: ${values.description}`,
+              categoryId: values.categoryId || null,
+              transactionId: id,
+              date: values.transactionDate,
+              notes: `مصروف — نصيب ${p.personName} ${equalShare} — لم يدفع شيئاً`,
+            }),
+          ),
+        ];
+        await Promise.all(entries);
+        await queryClient.invalidateQueries({ queryKey: ['people'] });
+      }
+
       await queryClient.invalidateQueries({ queryKey: TRANSACTIONS_QUERY_KEY });
       toast.success(t('common.save'));
       navigate(`${ROUTE_PATHS.TRANSACTIONS}/${id}`);

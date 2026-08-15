@@ -194,9 +194,11 @@ export const transactionService = {
       updates.destinationPaymentSourceId = input.destinationPaymentSourceId || null;
     if (input.paymentMethod) updates.paymentMethod = input.paymentMethod;
     if (input.categoryId !== undefined) updates.categoryId = input.categoryId || null;
+    if (input.categoryName !== undefined) updates.categoryName = input.categoryName || null;
     if (input.description) updates.description = input.description;
     if (input.notes !== undefined) updates.notes = input.notes;
     if (input.transactionDate) updates.transactionDate = input.transactionDate;
+    if (input.allPartners !== undefined) updates.allPartners = input.allPartners;
 
     await updateDoc(ref, updates);
     return docToRecord(id, { ...snap.data(), ...updates });

@@ -175,6 +175,12 @@ export const personService = {
     return { id: ref.id, ...data };
   },
 
+  async deleteLedgerEntriesByTransactionId(transactionId: string): Promise<void> {
+    const q = query(collection(db, LEDGER_COL), where('transactionId', '==', transactionId));
+    const snap = await getDocs(q);
+    await Promise.all(snap.docs.map((d) => deleteDoc(doc(db, LEDGER_COL, d.id))));
+  },
+
   async createSettlement(input: CreateSettlementInput): Promise<{
     ledgerEntry: PersonLedgerEntry;
     transaction: TransactionRecord;
