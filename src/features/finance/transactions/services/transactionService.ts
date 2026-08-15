@@ -5,6 +5,7 @@ import {
   getDoc,
   addDoc,
   updateDoc,
+  deleteDoc,
   query,
   orderBy,
 } from 'firebase/firestore';
@@ -241,5 +242,9 @@ export const transactionService = {
     const { id: _oldId, ...rest } = data;
     const ref = await addDoc(collection(db, COL), rest);
     return { ...data, id: ref.id };
+  },
+
+  async delete(id: string): Promise<void> {
+    await deleteDoc(doc(db, COL, id));
   },
 };

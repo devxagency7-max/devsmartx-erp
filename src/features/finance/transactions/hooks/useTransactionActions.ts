@@ -33,5 +33,18 @@ export function useTransactionActions() {
     }
   }
 
-  return { cancel, duplicate, isLoadingId: loadingId };
+  async function remove(id: string): Promise<boolean> {
+    setLoadingId(id);
+    try {
+      await transactionService.delete(id);
+      await queryClient.invalidateQueries({ queryKey: TRANSACTIONS_QUERY_KEY });
+      return true;
+    } catch {
+      return false;
+    } finally {
+      setLoadingId(null);
+    }
+  }
+
+  return { cancel, duplicate, remove, isLoadingId: loadingId };
 }

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
   MoreHorizontal, Eye, Pencil, XCircle, CheckCircle,
-  ThumbsDown, RotateCcw, Copy, Download,
+  ThumbsDown, RotateCcw, Copy, Download, Trash2,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -33,8 +33,9 @@ interface TransactionActionsMenuProps {
 export function TransactionActionsMenu({ transaction: tx }: TransactionActionsMenuProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { cancel, duplicate, isLoadingId } = useTransactionActions();
+  const { cancel, duplicate, remove, isLoadingId } = useTransactionActions();
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const isBusy = isLoadingId === tx.id;
 
   const isTerminal =
@@ -46,6 +47,15 @@ export function TransactionActionsMenu({ transaction: tx }: TransactionActionsMe
     const ok = await cancel(tx.id);
     if (ok) setConfirmCancelOpen(false);
   }
+
+  async function handleDelete() {
+    const ok = await remove(tx.id);
+    if (ok) setConfirmDeleteOpen(false);
+  }
+
+  const isDeletable =
+    tx.status === TransactionStatus.Cancelled ||
+    tx.status === TransactionStatus.Draft;
 
   async function handleDuplicate() {
     const newId = await duplicate(tx.id);
@@ -113,6 +123,16 @@ export function TransactionActionsMenu({ transaction: tx }: TransactionActionsMe
               {t('transaction.actions.cancel')}
             </DropdownMenuItem>
           )}
+
+          {isDeletable && (
+            <DropdownMenuItem
+              onClick={() => setConfirmDeleteOpen(true)}
+              className="text-[hsl(var(--destructive))] focus:text-[hsl(var(--destructive))]"
+            >
+              <Trash2 size={14} className="mr-2" />
+              حذف نهائي
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -128,6 +148,25 @@ export function TransactionActionsMenu({ transaction: tx }: TransactionActionsMe
             </Button>
             <Button variant="destructive" onClick={handleCancel} disabled={isBusy}>
               {t('transaction.actions.cancel')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>حذف المعاملة نهائياً</DialogTitle>
+            <DialogDescription>
+              هيتحذف {tx.referenceNumber} بشكل نهائي ومش هيرجع. متأكد؟
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmDeleteOpen(false)}>
+              إلغاء
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={isBusy}>
+              <Trash2 size={14} className="mr-1" /> حذف نهائي
             </Button>
           </DialogFooter>
         </DialogContent>
