@@ -129,11 +129,18 @@ export const transactionService = {
         fileUrl: a.url,
         mimeType: a.mimeType ?? '',
       })),
-      partnerContributions: (input.partnerContributions ?? []).map((c) => ({
-        personId: c.personId,
-        personName: c.personName,
-        amount: c.amount,
-      })),
+      partnerContributions: (() => {
+        const contribs = input.partnerContributions ?? [];
+        const equalShare = contribs.length > 0
+          ? Math.round((input.amount / contribs.length) * 100) / 100
+          : 0;
+        return contribs.map((c) => ({
+          personId: c.personId,
+          personName: c.personName,
+          amount: c.amount,
+          equalShare,
+        }));
+      })(),
       transactionDate: input.transactionDate,
       createdAt: now(),
       updatedAt: now(),

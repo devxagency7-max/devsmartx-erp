@@ -56,6 +56,7 @@ export interface PartnerContributionEntry {
   personId: string;
   personName: string;
   amount: number;
+  equalShare?: number;
 }
 
 /** Shape used by the create/edit form. */
