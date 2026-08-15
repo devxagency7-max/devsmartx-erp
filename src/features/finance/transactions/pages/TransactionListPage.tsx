@@ -115,6 +115,9 @@ export function TransactionListPage() {
                     <th className="px-4 py-3 text-left font-medium text-[hsl(var(--muted-foreground))]">
                       {t('transaction.referenceNumber')}
                     </th>
+                    <th className="hidden px-4 py-3 text-start font-medium text-[hsl(var(--muted-foreground))] sm:table-cell">
+                      {t('transaction.description')}
+                    </th>
                     <th className="px-4 py-3 text-left font-medium text-[hsl(var(--muted-foreground))]">
                       {t('transaction.type')}
                     </th>
@@ -142,6 +145,9 @@ export function TransactionListPage() {
                     >
                       <td className="px-4 py-3 font-mono text-xs text-[hsl(var(--muted-foreground))]">
                         {tx.referenceNumber}
+                      </td>
+                      <td className="hidden px-4 py-3 max-w-[200px] sm:table-cell">
+                        <span className="block truncate text-[hsl(var(--foreground))]">{tx.description || '—'}</span>
                       </td>
                       <td className="px-4 py-3">
                         <TransactionTypeBadge type={tx.type} />
