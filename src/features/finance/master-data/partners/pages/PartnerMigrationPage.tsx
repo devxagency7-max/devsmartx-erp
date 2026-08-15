@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { collection, getDocs, addDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/core/firebase/firestore';
 
 interface PartnerRow { id: string; name: string; code: string; }
@@ -66,6 +66,19 @@ export default function PartnerMigrationPage() {
     } catch (e: any) {
       addLog('ERROR: ' + e.message);
     }
+    setLoading(false);
+  }
+
+  async function clearAllLedger() {
+    if (!window.confirm(`هتمسح ${ledger.length} entries — متأكد؟`)) return;
+    setLoading(true);
+    let deleted = 0;
+    for (const e of ledger) {
+      await deleteDoc(doc(db, 'personLedger', e.id));
+      deleted++;
+    }
+    addLog(`🗑 Deleted ${deleted} ledger entries`);
+    await loadData();
     setLoading(false);
   }
 
@@ -159,12 +172,15 @@ export default function PartnerMigrationPage() {
   return (
     <div className="p-6 space-y-4 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold">Partner Ledger Migration</h1>
-      <div className="flex gap-3">
+      <div className="flex gap-3 flex-wrap">
         <button onClick={loadData} disabled={loading} className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50">
           1. Load Data
         </button>
+        <button onClick={clearAllLedger} disabled={loading || ledger.length === 0} className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700 disabled:opacity-50">
+          2. Clear All Ledger ({ledger.length})
+        </button>
         <button onClick={runMigration} disabled={loading || txs.length === 0} className="rounded-lg bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700 disabled:opacity-50">
-          2. Run Migration
+          3. Run Migration
         </button>
       </div>
 
