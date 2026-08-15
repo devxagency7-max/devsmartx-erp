@@ -31,12 +31,14 @@ export function useCreateTransaction() {
       );
 
       const contributions = input.partnerContributions ?? [];
+      const allPartners = input.allPartners ?? [];
       if (contributions.length > 0 && input.type === TransactionType.Expense) {
+        const totalPartners = allPartners.length || contributions.length;
         await Promise.all(
           contributions.map((contribution) => {
             const partnerPaid = contribution.amount;
             const equalShare =
-              Math.round((input.amount / contributions.length) * 100) / 100;
+              Math.round((input.amount / totalPartners) * 100) / 100;
 
             if (partnerPaid > equalShare) {
               const owedBack = Math.round((partnerPaid - equalShare) * 100) / 100;

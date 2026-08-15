@@ -38,7 +38,7 @@ interface PaymentSourceOption {
 interface TransactionFormProps {
   defaultValues?: Partial<TransactionSchema>;
   paymentSources: PaymentSourceOption[];
-  onSubmit: (values: TransactionSchema, contributions: PartnerContributionEntry[], attachments: UploadResult[]) => Promise<void>;
+  onSubmit: (values: TransactionSchema, contributions: PartnerContributionEntry[], attachments: UploadResult[], allPartners: { personId: string; personName: string }[]) => Promise<void>;
   isLoading: boolean;
   error: string | null;
   onCancel: () => void;
@@ -58,6 +58,7 @@ export function TransactionForm({
 }: TransactionFormProps) {
   const { t } = useTranslation();
   const [contributions, setContributions] = useState<PartnerContributionEntry[]>([]);
+  const [allPartners, setAllPartners] = useState<{ personId: string; personName: string }[]>([]);
   const [attachments, setAttachments] = useState<UploadResult[]>([]);
 
   const {
@@ -118,7 +119,7 @@ export function TransactionForm({
   const fieldClass = readOnly ? 'pointer-events-none opacity-60' : '';
 
   return (
-    <form onSubmit={handleSubmit((values) => onSubmit(values, contributions, attachments))} noValidate className="space-y-5">
+    <form onSubmit={handleSubmit((values) => onSubmit(values, contributions, attachments, allPartners))} noValidate className="space-y-5">
       {readOnly && (
         <div className="flex items-start gap-2 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--muted))]/40 px-3 py-2.5 text-sm text-[hsl(var(--muted-foreground))]">
           <Info size={14} className="mt-0.5 shrink-0" />
@@ -194,6 +195,7 @@ export function TransactionForm({
               currency={watchedCurrency ?? 'EGP'}
               contributions={contributions}
               onChange={setContributions}
+              onAllPartnersChange={setAllPartners}
             />
           )}
         </div>

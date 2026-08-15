@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { PlusCircle, Trash2, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@/shared/components/ui/input';
@@ -11,11 +12,18 @@ interface Props {
   currency: string;
   contributions: PartnerContributionEntry[];
   onChange: (contributions: PartnerContributionEntry[]) => void;
+  onAllPartnersChange?: (all: { personId: string; personName: string }[]) => void;
 }
 
-export function PartnerContributionsSection({ totalAmount, currency, contributions, onChange }: Props) {
+export function PartnerContributionsSection({ totalAmount, currency, contributions, onChange, onAllPartnersChange }: Props) {
   const { t } = useTranslation();
   const { data: partners = [], isLoading } = usePartners({ status: 'active' });
+
+  useEffect(() => {
+    if (!isLoading && onAllPartnersChange) {
+      onAllPartnersChange(partners.map((p) => ({ personId: p.id, personName: p.name })));
+    }
+  }, [partners, isLoading, onAllPartnersChange]);
 
   const totalContributed = contributions.reduce((s, c) => s + c.amount, 0);
 

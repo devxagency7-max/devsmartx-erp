@@ -32,9 +32,9 @@ export function CreateTransactionPage() {
     ]);
   }, [setItems, t]);
 
-  async function handleSubmit(values: TransactionSchema, contributions: PartnerContributionEntry[], attachments: UploadResult[]) {
+  async function handleSubmit(values: TransactionSchema, contributions: PartnerContributionEntry[], attachments: UploadResult[], allPartners: { personId: string; personName: string }[]) {
     clearError();
-    const record = await createTransaction({ ...values, partnerContributions: contributions, attachments });
+    const record = await createTransaction({ ...values, partnerContributions: contributions, allPartners, attachments });
     if (record) {
       toast.success(t('transaction.createTransaction'));
       navigate(`${ROUTE_PATHS.TRANSACTIONS}/${record.id}`);

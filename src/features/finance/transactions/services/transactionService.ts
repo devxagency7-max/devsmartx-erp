@@ -48,6 +48,7 @@ function docToRecord(id: string, data: Record<string, unknown>): TransactionReco
     notes: (data.notes as string) ?? '',
     attachments: (data.attachments as TransactionRecord['attachments']) ?? [],
     partnerContributions: (data.partnerContributions as TransactionRecord['partnerContributions']) ?? [],
+    allPartners: (data.allPartners as TransactionRecord['allPartners']) ?? [],
     transactionDate: data.transactionDate as string,
     createdAt: data.createdAt as string,
     updatedAt: data.updatedAt as string,
@@ -129,10 +130,12 @@ export const transactionService = {
         fileUrl: a.url,
         mimeType: a.mimeType ?? '',
       })),
+      allPartners: (input.allPartners ?? []),
       partnerContributions: (() => {
         const contribs = input.partnerContributions ?? [];
-        const equalShare = contribs.length > 0
-          ? Math.round((input.amount / contribs.length) * 100) / 100
+        const totalPartners = (input.allPartners ?? []).length || contribs.length;
+        const equalShare = totalPartners > 0
+          ? Math.round((input.amount / totalPartners) * 100) / 100
           : 0;
         return contribs.map((c) => ({
           personId: c.personId,

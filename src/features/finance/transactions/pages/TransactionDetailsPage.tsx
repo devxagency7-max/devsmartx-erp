@@ -149,11 +149,19 @@ export function TransactionDetailsPage() {
             <Separator className="mb-4" />
             {(() => {
               const contribs = tx.partnerContributions;
-              const contributed = contribs.reduce((s, c) => s + c.amount, 0);
+              const allPartners = tx.allPartners ?? [];
+              const totalPartners = allPartners.length || contribs.length;
               const equalShare = contribs[0]?.equalShare
-                ?? Math.round((tx.amount / contribs.length) * 100) / 100;
+                ?? Math.round((tx.amount / totalPartners) * 100) / 100;
+              const contributed = contribs.reduce((s, c) => s + c.amount, 0);
+
+              // Build full list: paid partners + unpaid partners from allPartners
+              const paidIds = new Set(contribs.map((c) => c.personId));
+              const unpaidPartners = allPartners.filter((p) => !paidIds.has(p.personId));
+
               return (
                 <div className="space-y-2">
+                  {/* Partners who contributed (paid something) */}
                   {contribs.map((c) => {
                     const diff = Math.round((c.amount - equalShare) * 100) / 100;
                     const settled = Math.abs(diff) < 0.01;
@@ -165,7 +173,7 @@ export function TransactionDetailsPage() {
                           owes
                             ? 'border-destructive/30 bg-destructive/5'
                             : settled
-                            ? 'border-[hsl(var(--border))] bg-[hsl(var(--muted))]/20'
+                            ? 'border-green-500/30 bg-green-500/5'
                             : 'border-green-500/30 bg-green-500/5'
                         }`}
                       >
@@ -175,21 +183,39 @@ export function TransactionDetailsPage() {
                             {formatAmount(c.amount, tx.currency)}
                           </span>
                         </div>
-                        <div className="mt-1 flex items-center justify-between">
-                          <p className={`text-xs ${owes ? 'text-destructive' : settled ? 'text-green-600 dark:text-green-400' : 'text-green-600 dark:text-green-400'}`}>
-                            {owes
-                              ? `عليه ${formatAmount(Math.abs(diff), tx.currency)} (نصيبه ${formatAmount(equalShare, tx.currency)})`
-                              : settled
-                              ? 'دفع نصيبه كاملاً'
-                              : `دفع زيادة ${formatAmount(diff, tx.currency)}`}
-                          </p>
-                        </div>
+                        <p className={`mt-1 text-xs ${owes ? 'text-destructive' : 'text-green-600 dark:text-green-400'}`}>
+                          {owes
+                            ? `عليه ${formatAmount(Math.abs(diff), tx.currency)} — نصيبه ${formatAmount(equalShare, tx.currency)}`
+                            : settled
+                            ? 'دفع نصيبه كاملاً ✓'
+                            : `دفع زيادة ${formatAmount(diff, tx.currency)} ✓`}
+                        </p>
                       </div>
                     );
                   })}
 
+                  {/* Partners who didn't pay at all */}
+                  {unpaidPartners.map((p) => (
+                    <div
+                      key={p.personId}
+                      className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-[hsl(var(--foreground))]">{p.personName}</span>
+                        <span className="font-mono text-sm font-semibold text-destructive">
+                          {formatAmount(0, tx.currency)}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-destructive">
+                        عليه {formatAmount(equalShare, tx.currency)} — لم يدفع شيئاً
+                      </p>
+                    </div>
+                  ))}
+
                   <div className="flex items-center justify-between border-t border-[hsl(var(--border))] px-1 pt-3">
-                    <span className="text-xs text-[hsl(var(--muted-foreground))]">إجمالي المساهمات من {formatAmount(tx.amount, tx.currency)}</span>
+                    <span className="text-xs text-[hsl(var(--muted-foreground))]">
+                      إجمالي المساهمات من {formatAmount(tx.amount, tx.currency)} ({totalPartners} شركاء، نصيب كل واحد {formatAmount(equalShare, tx.currency)})
+                    </span>
                     <span className={`font-mono text-sm font-bold ${contributed >= tx.amount ? 'text-green-500' : 'text-[hsl(var(--foreground))]'}`}>
                       {formatAmount(contributed, tx.currency)}
                     </span>

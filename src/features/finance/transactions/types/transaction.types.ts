@@ -37,6 +37,7 @@ export interface TransactionRecord {
 
   attachments: AttachmentRef[];
   partnerContributions?: PartnerContributionEntry[];
+  allPartners?: { personId: string; personName: string }[];
 
   transactionDate: string;  // YYYY-MM-DD
   createdAt: string;        // ISO 8601 UTC
@@ -74,6 +75,7 @@ export interface TransactionFormInput {
   notes: string;
   transactionDate: string;
   partnerContributions?: PartnerContributionEntry[];
+  allPartners?: { personId: string; personName: string }[];
   attachments?: import('@/shared/upload').UploadResult[];
 }
 
