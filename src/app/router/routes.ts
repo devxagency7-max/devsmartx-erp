@@ -82,6 +82,7 @@ export const dashboardRoutes = [
   // Finance — Master Data — Partners
   { path: ROUTE_PATHS.PARTNERS, Component: lazy(() => import('@/features/finance/master-data/partners/pages/PartnersListPage')) },
   { path: ROUTE_PATHS.PARTNERS_NEW, Component: lazy(() => import('@/features/finance/master-data/partners/pages/CreatePartnerPage')) },
+  { path: ROUTE_PATHS.PARTNER_MIGRATION, Component: lazy(() => import('@/features/finance/master-data/partners/pages/PartnerMigrationPage')) },
   { path: ROUTE_PATHS.PARTNER_DETAILS, Component: lazy(() => import('@/features/finance/master-data/partners/pages/PartnerDetailsPage')) },
   { path: ROUTE_PATHS.PARTNER_EDIT, Component: lazy(() => import('@/features/finance/master-data/partners/pages/EditPartnerPage')) },
   // Finance — Master Data — Cost Centers

@@ -34,6 +34,7 @@ export const ROUTE_PATHS = {
   PARTNERS_NEW: '/finance/master-data/partners/new',
   PARTNER_DETAILS: '/finance/master-data/partners/:id',
   PARTNER_EDIT: '/finance/master-data/partners/:id/edit',
+  PARTNER_MIGRATION: '/finance/master-data/partners/migration',
   COST_CENTERS: '/finance/master-data/cost-centers',
   COST_CENTERS_NEW: '/finance/master-data/cost-centers/new',
   COST_CENTER_EDIT: '/finance/master-data/cost-centers/:id/edit',
