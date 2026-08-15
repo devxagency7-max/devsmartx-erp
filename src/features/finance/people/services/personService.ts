@@ -143,10 +143,10 @@ export const personService = {
     const q = query(
       collection(db, LEDGER_COL),
       where('personId', '==', personId),
-      orderBy('date', 'desc'),
     );
     const snap = await getDocs(q);
-    return snap.docs.map((d) => ledgerDocToRecord(d.id, d.data() as Record<string, unknown>));
+    const entries = snap.docs.map((d) => ledgerDocToRecord(d.id, d.data() as Record<string, unknown>));
+    return entries.sort((a, b) => b.date.localeCompare(a.date));
   },
 
   async getLedgerBalances(personId: string) {
