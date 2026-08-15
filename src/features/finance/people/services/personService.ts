@@ -162,7 +162,7 @@ export const personService = {
       currency: input.currency,
       reason: input.reason,
       categoryId: input.categoryId ?? null,
-      transactionId: null,
+      transactionId: input.transactionId ?? null,
       relatedProjectId: input.relatedProjectId ?? null,
       reference: generateLedgerRef(),
       date: input.date,

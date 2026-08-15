@@ -68,6 +68,7 @@ export interface CreateLedgerEntryInput {
   currency: string;
   reason: string;
   categoryId?: string | null;
+  transactionId?: string | null;
   relatedProjectId?: string | null;
   date: string;
   notes?: string;

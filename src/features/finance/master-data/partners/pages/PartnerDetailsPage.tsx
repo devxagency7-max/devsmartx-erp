@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Pencil, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Pencil, TrendingUp, TrendingDown, Minus, ExternalLink } from 'lucide-react';
 import { useBreadcrumb } from '@/shared/layout/BreadcrumbContext';
 import { ROUTE_PATHS } from '@/app/router/constants';
 import { usePartner } from '../hooks/usePartners';
@@ -116,57 +116,82 @@ export default function PartnerDetailsPage() {
       </div>
 
       {/* Ledger history */}
-      {ledgerEntries.length > 0 && (
-        <div>
-          <h2 className="text-base font-semibold text-foreground mb-3">سجل المعاملات</h2>
-          <div className="rounded-xl border border-border bg-card overflow-hidden overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50 border-b border-border">
-                <tr>
-                  <th className="px-4 py-3 text-start font-medium text-muted-foreground">التاريخ</th>
-                  <th className="px-4 py-3 text-start font-medium text-muted-foreground">السبب</th>
-                  <th className="px-4 py-3 text-start font-medium text-muted-foreground">الاتجاه</th>
-                  <th className="px-4 py-3 text-end font-medium text-muted-foreground">المبلغ</th>
-                  <th className="px-4 py-3 text-start font-medium text-muted-foreground">الحالة</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {ledgerEntries.map((entry) => (
-                  <tr key={entry.id} className="hover:bg-muted/30 transition-colors">
-                    <td className="px-4 py-3 text-muted-foreground tabular-nums">
-                      {new Date(entry.date).toLocaleDateString('ar-EG')}
-                    </td>
-                    <td className="px-4 py-3 text-foreground max-w-[200px] truncate">{entry.reason}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-                        entry.direction === 'PERSON_OWES_COMPANY'
-                          ? 'bg-destructive/10 text-destructive'
-                          : 'bg-green-500/10 text-green-500'
-                      }`}>
-                        {entry.direction === 'PERSON_OWES_COMPANY' ? 'مدين' : 'دائن'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-end font-mono font-medium tabular-nums">
-                      {formatAmount(entry.amount, entry.currency as CurrencyCode)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                        entry.status === 'Settled'
-                          ? 'bg-green-500/10 text-green-500'
-                          : entry.status === 'Cancelled'
-                          ? 'bg-muted text-muted-foreground'
-                          : 'bg-yellow-500/10 text-yellow-500'
-                      }`}>
-                        {entry.status === 'Settled' ? 'مسوى' : entry.status === 'Cancelled' ? 'ملغي' : 'معلق'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <div>
+        <h2 className="text-base font-semibold text-foreground mb-3">سجل الديون والمستحقات</h2>
+        {ledgerEntries.length === 0 ? (
+          <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+            لا يوجد سجل بعد
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="space-y-2">
+            {ledgerEntries.map((entry) => (
+              <div
+                key={entry.id}
+                className={`rounded-xl border px-4 py-3 flex items-start gap-4 ${
+                  entry.direction === 'PERSON_OWES_COMPANY'
+                    ? 'border-destructive/30 bg-destructive/5'
+                    : 'border-green-500/30 bg-green-500/5'
+                }`}
+              >
+                {/* Direction icon */}
+                <div className={`mt-0.5 rounded-full p-1.5 shrink-0 ${
+                  entry.direction === 'PERSON_OWES_COMPANY'
+                    ? 'bg-destructive/10 text-destructive'
+                    : 'bg-green-500/10 text-green-500'
+                }`}>
+                  {entry.direction === 'PERSON_OWES_COMPANY'
+                    ? <TrendingDown className="h-3.5 w-3.5" />
+                    : <TrendingUp className="h-3.5 w-3.5" />}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{entry.reason}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {new Date(entry.date).toLocaleDateString('ar-EG')}
+                        {entry.notes && (
+                          <span className="ms-2 text-muted-foreground/70">{entry.notes}</span>
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className={`font-mono text-sm font-bold ${
+                        entry.direction === 'PERSON_OWES_COMPANY' ? 'text-destructive' : 'text-green-500'
+                      }`}>
+                        {entry.direction === 'PERSON_OWES_COMPANY' ? '+' : '-'}
+                        {formatAmount(entry.amount, entry.currency as CurrencyCode)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                      entry.status === 'Settled'
+                        ? 'bg-green-500/10 text-green-500'
+                        : entry.status === 'Cancelled'
+                        ? 'bg-muted text-muted-foreground'
+                        : 'bg-yellow-500/10 text-yellow-600'
+                    }`}>
+                      {entry.status === 'Settled' ? 'مسوّى' : entry.status === 'Cancelled' ? 'ملغي' : 'معلق'}
+                    </span>
+                    {entry.transactionId && (
+                      <button
+                        onClick={() => navigate(ROUTE_PATHS.TRANSACTION_DETAILS.replace(':id', entry.transactionId!))}
+                        className="inline-flex items-center gap-1 rounded-full bg-[hsl(var(--primary))]/10 px-2 py-0.5 text-[10px] font-medium text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary))]/20 transition-colors"
+                      >
+                        <ExternalLink className="h-2.5 w-2.5" />
+                        عرض المعاملة
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

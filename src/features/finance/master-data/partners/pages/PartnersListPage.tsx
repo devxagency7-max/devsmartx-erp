@@ -1,8 +1,9 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Eye, Pencil, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Plus, Eye, Pencil, Trash2, ToggleLeft, ToggleRight, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { migrateLedgerEntriesFromTransactions } from '@/features/finance/transactions/services/migrateLedgerEntries';
 import { usePersonLedger } from '@/features/finance/people/hooks/usePeople';
 import { derivePersonBalances } from '@/features/finance/people/utils/personHelpers';
 import { formatAmount } from '@/features/finance/transactions/utils/formatAmount';
@@ -61,8 +62,21 @@ export default function PartnersListPage() {
   const { data: partners = [], isLoading } = usePartners(filters);
   const { setStatus, remove } = usePartnerActions();
   const { exportData, isExporting } = useExcelExport();
+  const [isMigrating, setIsMigrating] = useState(false);
 
   const hasFilters = filters.search !== '' || filters.status !== '';
+
+  async function handleMigrate() {
+    setIsMigrating(true);
+    try {
+      const result = await migrateLedgerEntriesFromTransactions();
+      toast.success(`تم: ${result.written} قيد جديد من ${result.processed} معاملة`);
+    } catch (e) {
+      toast.error('فشل المزامنة');
+    } finally {
+      setIsMigrating(false);
+    }
+  }
 
   const handleExportAll = useCallback(async () => {
     await exportData({
@@ -98,6 +112,15 @@ export default function PartnersListPage() {
           <p className="text-sm text-muted-foreground mt-1">{t('masterData.partners.description')}</p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleMigrate}
+            disabled={isMigrating}
+            title="مزامنة الديون من المعاملات الموجودة"
+            className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`h-4 w-4 ${isMigrating ? 'animate-spin' : ''}`} />
+            {isMigrating ? 'جاري...' : 'مزامنة الديون'}
+          </button>
           <ExportButton
             onExportAll={handleExportAll}
             onExportFiltered={hasFilters ? handleExportFiltered : undefined}
