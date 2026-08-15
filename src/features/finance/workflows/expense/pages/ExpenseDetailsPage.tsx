@@ -100,25 +100,23 @@ export function ExpenseDetailsPage() {
             <DetailRow label={t('transaction.status')} value={<TransactionStatusBadge status={exp.status} />} />
             <DetailRow label={t('transaction.amount')} value={formatAmount(exp.amount, exp.currency as CurrencyCode)} />
             <DetailRow label={t('transaction.currency')} value={exp.currency} />
-            <DetailRow label={t('transaction.category')} value={exp.categoryName ?? '—'} />
             <DetailRow label={t('transaction.paymentSource')} value={exp.paymentSourceName} />
             <DetailRow label={t('transaction.paymentMethod')} value={<Badge variant="outline">{t(`transaction.pm_${exp.paymentMethod}`)}</Badge>} />
             <DetailRow label={t('transaction.transactionDate')} value={exp.transactionDate} />
-            <DetailRow label={t('transaction.createdBy')} value={exp.createdBy} />
+            {exp.description && (
+              <DetailRow label={t('transaction.description')} value={<span className="text-end max-w-xs truncate">{exp.description}</span>} />
+            )}
+            {exp.notes && (
+              <DetailRow label={t('transaction.notes')} value={<span className="text-end max-w-xs truncate">{exp.notes}</span>} />
+            )}
+            {exp.partnerId && exp.partnerName && (
+              <DetailRow label={t('transaction.partner')} value={exp.partnerName} />
+            )}
+            <DetailRow label={t('transaction.createdAt')} value={new Date(exp.createdAt).toLocaleDateString('ar-EG')} />
             {exp.approvedBy && <DetailRow label={t('transaction.approvedBy')} value={exp.approvedBy} />}
           </div>
         </CardContent>
       </Card>
-
-      {/* Notes */}
-      {exp.notes && (
-        <Card>
-          <CardContent className="pt-6">
-            <SectionHeader title={t('transaction.notes')} />
-            <p className="text-sm text-[hsl(var(--muted-foreground))]">{exp.notes}</p>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Attachments */}
       <Card>
