@@ -113,7 +113,6 @@ export function ExpenseListPage() {
                   <tr className="border-b border-[hsl(var(--border))] bg-[hsl(var(--muted))]/40">
                     <th className="px-4 py-3 text-left font-medium text-[hsl(var(--muted-foreground))]">{t('transaction.referenceNumber')}</th>
                     <th className="px-4 py-3 text-left font-medium text-[hsl(var(--muted-foreground))]">{t('transaction.description')}</th>
-                    <th className="px-4 py-3 text-left font-medium text-[hsl(var(--muted-foreground))]">{t('transaction.category')}</th>
                     <th className="px-4 py-3 text-left font-medium text-[hsl(var(--muted-foreground))]">{t('transaction.paymentSource')}</th>
                     <th className="px-4 py-3 text-right font-medium text-[hsl(var(--muted-foreground))]">{t('transaction.amount')}</th>
                     <th className="px-4 py-3 text-left font-medium text-[hsl(var(--muted-foreground))]">{t('transaction.paymentMethod')}</th>
@@ -131,7 +130,6 @@ export function ExpenseListPage() {
                     >
                       <td className="px-4 py-3 font-mono text-xs">{exp.referenceNumber}</td>
                       <td className="px-4 py-3 max-w-[200px] truncate text-foreground">{exp.description || '—'}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{exp.categoryName ?? '—'}</td>
                       <td className="px-4 py-3">{exp.paymentSourceName}</td>
                       <td className="px-4 py-3 text-right font-medium">
                         {formatAmount(exp.amount, exp.currency as CurrencyCode)}
