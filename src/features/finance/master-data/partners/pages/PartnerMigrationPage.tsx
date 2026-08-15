@@ -3,7 +3,7 @@ import { collection, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore'
 import { db } from '@/core/firebase/firestore';
 
 interface PartnerRow { id: string; name: string; code: string; }
-interface TxRow { id: string; ref: string; amount: number; currency: string; date: string; contribs: { personId: string; personName: string; amount: number; equalShare?: number }[]; allPartners: { personId: string; personName: string }[]; }
+interface TxRow { id: string; ref: string; description: string; amount: number; currency: string; date: string; contribs: { personId: string; personName: string; amount: number; equalShare?: number }[]; allPartners: { personId: string; personName: string }[]; }
 interface LedgerRow { id: string; personId: string; direction: string; amount: number; reason: string; transactionId: string | null; }
 
 function generateRef() {
@@ -40,6 +40,7 @@ export default function PartnerMigrationPage() {
           tRows.push({
             id: d.id,
             ref: data.referenceNumber,
+            description: data.description || data.referenceNumber,
             amount: data.amount,
             currency: data.currency,
             date: data.transactionDate,
@@ -117,7 +118,7 @@ export default function PartnerMigrationPage() {
           direction,
           amount,
           currency: tx.currency,
-          reason: direction === 'PERSON_OWES_COMPANY' ? `نصيب في مصروف: ${tx.ref}` : `مساهمة في مصروف: ${tx.ref}`,
+          reason: direction === 'PERSON_OWES_COMPANY' ? `نصيب في مصروف: ${tx.description}` : `مساهمة في مصروف: ${tx.description}`,
           categoryId: null,
           transactionId: tx.id,
           relatedProjectId: null,
@@ -147,7 +148,7 @@ export default function PartnerMigrationPage() {
           direction: 'PERSON_OWES_COMPANY',
           amount: equalShare,
           currency: tx.currency,
-          reason: `نصيب في مصروف: ${tx.ref}`,
+          reason: `نصيب في مصروف: ${tx.description}`,
           categoryId: null,
           transactionId: tx.id,
           relatedProjectId: null,
