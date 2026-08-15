@@ -127,13 +127,38 @@ export function TransactionDetailsPage() {
               <InfoRow label={t('transaction.destinationPaymentSource')} value={tx.destinationPaymentSourceName} />
             )}
             <InfoRow label={t('transaction.paymentMethod')} value={t(`transaction.pm_${tx.paymentMethod}`)} />
-            <InfoRow label={t('transaction.category')} value={tx.categoryName ?? '—'} />
             <InfoRow label={t('transaction.transactionDate')} value={tx.transactionDate} />
-            <InfoRow label={t('transaction.description')} value={tx.description} />
+            <InfoRow label={t('transaction.description')} value={tx.description || '—'} />
             {tx.notes && <InfoRow label={t('transaction.notes')} value={tx.notes} />}
           </dl>
         </CardContent>
       </Card>
+
+      {/* Partner Contributions */}
+      {tx.partnerContributions && tx.partnerContributions.length > 0 && (
+        <Card>
+          <CardContent className="pt-6">
+            <SectionHeader title="مساهمات الشركاء" className="pb-4" />
+            <Separator className="mb-4" />
+            <div className="space-y-2">
+              {tx.partnerContributions.map((c) => (
+                <div key={c.personId} className="flex items-center justify-between rounded-lg bg-[hsl(var(--muted))]/40 px-4 py-2.5">
+                  <span className="text-sm font-medium text-[hsl(var(--foreground))]">{c.personName}</span>
+                  <span className="font-mono text-sm font-semibold text-[hsl(var(--primary))]">
+                    {formatAmount(c.amount, tx.currency)}
+                  </span>
+                </div>
+              ))}
+              <div className="flex items-center justify-between border-t border-[hsl(var(--border))] px-4 pt-3">
+                <span className="text-xs text-[hsl(var(--muted-foreground))]">إجمالي المساهمات</span>
+                <span className="font-mono text-sm font-bold text-[hsl(var(--foreground))]">
+                  {formatAmount(tx.partnerContributions.reduce((s, c) => s + c.amount, 0), tx.currency)}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Attachments */}
       {tx.attachments && tx.attachments.length > 0 && (

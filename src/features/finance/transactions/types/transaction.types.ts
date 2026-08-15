@@ -36,6 +36,7 @@ export interface TransactionRecord {
   notes: string;
 
   attachments: AttachmentRef[];
+  partnerContributions?: PartnerContributionEntry[];
 
   transactionDate: string;  // YYYY-MM-DD
   createdAt: string;        // ISO 8601 UTC
