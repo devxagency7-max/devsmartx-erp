@@ -147,22 +147,48 @@ export function TransactionDetailsPage() {
           <CardContent className="pt-6">
             <SectionHeader title="مساهمات الشركاء" className="pb-4" />
             <Separator className="mb-4" />
-            <div className="space-y-2">
-              {tx.partnerContributions.map((c) => (
-                <div key={c.personId} className="flex items-center justify-between rounded-lg bg-[hsl(var(--muted))]/40 px-4 py-2.5">
-                  <span className="text-sm font-medium text-[hsl(var(--foreground))]">{c.personName}</span>
-                  <span className="font-mono text-sm font-semibold text-[hsl(var(--primary))]">
-                    {formatAmount(c.amount, tx.currency)}
-                  </span>
+            {(() => {
+              const total = tx.partnerContributions.reduce((s, c) => s + c.amount, 0);
+              const equalShare = Math.round((tx.amount / tx.partnerContributions.length) * 100) / 100;
+              return (
+                <div className="space-y-2">
+                  {tx.partnerContributions.map((c) => {
+                    const diff = Math.round((c.amount - equalShare) * 100) / 100;
+                    return (
+                      <div key={c.personId} className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--muted))]/20 px-4 py-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-[hsl(var(--foreground))]">{c.personName}</span>
+                          <span className="font-mono text-sm font-semibold text-[hsl(var(--foreground))]">
+                            {formatAmount(c.amount, tx.currency)}
+                          </span>
+                        </div>
+                        {diff !== 0 && (
+                          <div className="mt-1.5 flex items-center justify-between">
+                            <span className="text-xs text-[hsl(var(--muted-foreground))]">
+                              نصيبه {formatAmount(equalShare, tx.currency)}
+                            </span>
+                            <span className={`text-xs font-medium ${diff > 0 ? 'text-green-500' : 'text-destructive'}`}>
+                              {diff > 0
+                                ? `دفع زيادة ${formatAmount(diff, tx.currency)} ← الشركة مدينة له`
+                                : `عليه ${formatAmount(Math.abs(diff), tx.currency)} للشركة`}
+                            </span>
+                          </div>
+                        )}
+                        {diff === 0 && (
+                          <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">دفع نصيبه كامل</p>
+                        )}
+                      </div>
+                    );
+                  })}
+                  <div className="flex items-center justify-between border-t border-[hsl(var(--border))] px-1 pt-3">
+                    <span className="text-xs text-[hsl(var(--muted-foreground))]">إجمالي المساهمات</span>
+                    <span className="font-mono text-sm font-bold text-[hsl(var(--foreground))]">
+                      {formatAmount(total, tx.currency)}
+                    </span>
+                  </div>
                 </div>
-              ))}
-              <div className="flex items-center justify-between border-t border-[hsl(var(--border))] px-4 pt-3">
-                <span className="text-xs text-[hsl(var(--muted-foreground))]">إجمالي المساهمات</span>
-                <span className="font-mono text-sm font-bold text-[hsl(var(--foreground))]">
-                  {formatAmount(tx.partnerContributions.reduce((s, c) => s + c.amount, 0), tx.currency)}
-                </span>
-              </div>
-            </div>
+              );
+            })()}
           </CardContent>
         </Card>
       )}
