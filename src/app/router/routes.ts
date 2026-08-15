@@ -89,8 +89,6 @@ export const dashboardRoutes = [
   { path: ROUTE_PATHS.COST_CENTERS, Component: lazy(() => import('@/features/finance/master-data/cost-centers/pages/CostCentersListPage')) },
   { path: ROUTE_PATHS.COST_CENTERS_NEW, Component: lazy(() => import('@/features/finance/master-data/cost-centers/pages/CreateCostCenterPage')) },
   { path: ROUTE_PATHS.COST_CENTER_EDIT, Component: lazy(() => import('@/features/finance/master-data/cost-centers/pages/EditCostCenterPage')) },
-  // Finance — Master Data — Currencies
-  { path: ROUTE_PATHS.CURRENCIES, Component: lazy(() => import('@/features/finance/master-data/currencies/pages/CurrenciesPage')) },
   // Finance — Recurring Commitments
   { path: ROUTE_PATHS.COMMITMENTS, Component: lazy(() => import('@/features/finance/commitments/pages/RecurringCommitmentsListPage')) },
   { path: ROUTE_PATHS.COMMITMENTS_NEW, Component: lazy(() => import('@/features/finance/commitments/pages/CreateCommitmentPage')) },
