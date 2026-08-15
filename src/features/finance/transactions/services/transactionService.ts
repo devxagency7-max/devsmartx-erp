@@ -10,6 +10,16 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import { db } from '@/core/firebase/firestore';
+
+let categoryCache: Map<string, string> | null = null;
+async function getCategoryName(id: string | null): Promise<string | null> {
+  if (!id) return null;
+  if (!categoryCache) {
+    const snap = await getDocs(collection(db, 'categories'));
+    categoryCache = new Map(snap.docs.map((d) => [d.id, (d.data() as any).name as string]));
+  }
+  return categoryCache.get(id) ?? null;
+}
 import { TransactionType } from '@/features/finance/domain/enums/TransactionType';
 import { TransactionStatus } from '@/features/finance/domain/enums/TransactionStatus';
 import { PaymentMethod } from '@/features/finance/domain/enums/PaymentMethod';
@@ -91,6 +101,14 @@ export const transactionService = {
     const q = query(collection(db, COL), orderBy('transactionDate', 'desc'));
     const snap = await getDocs(q);
     const list = snap.docs.map((d) => docToRecord(d.id, d.data() as Record<string, unknown>));
+    // Backfill categoryName for old records that have categoryId but no categoryName
+    await Promise.all(
+      list.map(async (t) => {
+        if (t.categoryId && !t.categoryName) {
+          t.categoryName = await getCategoryName(t.categoryId);
+        }
+      }),
+    );
     return filters ? applyFilters(list, filters) : list;
   },
 
