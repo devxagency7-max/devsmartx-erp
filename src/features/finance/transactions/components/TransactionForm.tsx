@@ -37,6 +37,7 @@ interface PaymentSourceOption {
 
 interface TransactionFormProps {
   defaultValues?: Partial<TransactionSchema>;
+  defaultContributions?: PartnerContributionEntry[];
   paymentSources: PaymentSourceOption[];
   onSubmit: (values: TransactionSchema, contributions: PartnerContributionEntry[], attachments: UploadResult[], allPartners: { personId: string; personName: string }[]) => Promise<void>;
   isLoading: boolean;
@@ -48,6 +49,7 @@ interface TransactionFormProps {
 
 export function TransactionForm({
   defaultValues,
+  defaultContributions,
   paymentSources,
   onSubmit,
   isLoading,
@@ -57,7 +59,7 @@ export function TransactionForm({
   mode = 'create',
 }: TransactionFormProps) {
   const { t } = useTranslation();
-  const [contributions, setContributions] = useState<PartnerContributionEntry[]>([]);
+  const [contributions, setContributions] = useState<PartnerContributionEntry[]>(defaultContributions ?? []);
   const [allPartners, setAllPartners] = useState<{ personId: string; personName: string }[]>([]);
   const [attachments, setAttachments] = useState<UploadResult[]>([]);
 

@@ -171,6 +171,7 @@ export function EditTransactionPage() {
               notes: tx.notes,
               transactionDate: tx.transactionDate,
             }}
+            defaultContributions={tx.partnerContributions ?? []}
             paymentSources={paymentSourceOptions}
             onSubmit={handleSubmit}
             isLoading={isSaving}
